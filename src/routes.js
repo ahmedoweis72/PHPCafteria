@@ -1,16 +1,29 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import AddProductComponent from './views/AddProductComponent.vue'
 import AllProductComponent from './views/AllProductComponent.vue'
+import UsersComponent from './views/UsersComponent.vue';
 import NotFound from './views/NotFound.vue'
 import AddCategoryComponent from './views/AddCategoryComponent.vue'
 
 
 const routes = [
+    // {
+    //     path:'/',
+    //     name:'Home page',
+    //     component:HeaderComponent
+
+    // },
+    {
+        path:'/users',
+        name:'All users',
+        component:UsersComponent
+    },
     {
         path: '/add-product',
         name: 'add',
         component: AddProductComponent
     },
+    ,
     {
         path: '/all-product',
         name: 'all',
