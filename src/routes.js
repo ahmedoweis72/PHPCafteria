@@ -2,18 +2,24 @@ import { createRouter, createWebHistory } from 'vue-router'
 import AddProductComponent from './views/AddProductComponent.vue'
 import AllProductComponent from './views/AllProductComponent.vue'
 import NotFound from './views/NotFound.vue'
+import AddCategoryComponent from './views/AddCategoryComponent.vue'
 
 
 const routes = [
     {
-        path: '/addProductComponent',
+        path: '/add-product',
         name: 'add',
         component: AddProductComponent
     },
     {
-        path: '/allProductComponent',
+        path: '/all-product',
         name: 'all',
         component: AllProductComponent
+    },
+    {
+        path: '/add-category',
+        name: 'cat',
+        component: AddCategoryComponent
     },
     {
         path: '/:pathMatch(.*)*',
