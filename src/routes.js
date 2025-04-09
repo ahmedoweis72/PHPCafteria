@@ -5,11 +5,18 @@ import NotFound from './views/NotFound.vue'
 
 
 const routes = [
+    // {
+    //     path:'/',
+    //     name:'Home page',
+    //     component:HeaderComponent
+
+    // },
     {
         path: '/addProductComponent',
         name: 'add',
         component: AddProductComponent
     },
+    ,
     {
         path: '/allProductComponent',
         name: 'all',
