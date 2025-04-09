@@ -45,6 +45,47 @@ export const useProductStore = defineStore('product', {
       } finally {
         this.isLoading = false
       }
-    }
+    },
+
+    
+    async updateProduct(id, formData) {
+      try {
+        // Use POST with method override for better compatibility
+        const response = await axios.post(
+          `http://localhost/PHP_Cafeteria_Backend/public/products/${id}`,
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              'X-HTTP-Method-Override': 'PUT'
+            }
+          }
+        );
+      } catch (error) {
+        this.error = error.response?.data?.message || error.message;
+        throw error;
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
+    async fetchProduct(id) {
+      this.isLoading = true
+      this.error = null
+      try {
+        console.log(id);
+        const response = await axios.get(
+          
+          `http://localhost/PHP_Cafeteria_Backend/public/products/${id}`
+        )
+        this.currentProduct = response.data
+        return response.data
+      } catch (error) {
+        this.error = error.response?.data?.message || error.message
+        throw error
+      } finally {
+        this.isLoading = false
+      }
+    },
   }
 })

@@ -4,6 +4,7 @@ import AllProductComponent from './views/AllProductComponent.vue'
 import UsersComponent from './views/UsersComponent.vue';
 import NotFound from './views/NotFound.vue'
 import AddCategoryComponent from './views/AddCategoryComponent.vue'
+import EditProductComponent from './views/EditProductComponent.vue';
 
 
 const routes = [
@@ -33,6 +34,11 @@ const routes = [
         path: '/add-category',
         name: 'cat',
         component: AddCategoryComponent
+    },
+    {
+        path: '/edit-product/:id',
+        name: 'edit',
+        component: EditProductComponent
     },
     {
         path: '/:pathMatch(.*)*',

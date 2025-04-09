@@ -18,7 +18,7 @@ const user = {
                 <router-link to="/" class="nav-link">Home</router-link>
               </li>
               <li class="nav-item">
-                <router-link to="/products" class="nav-link">Products</router-link>
+                <router-link to="/all-product" class="nav-link">Products</router-link>
               </li>
               <li class="nav-item">
                 <router-link to="/users" class="nav-link">Users</router-link>
