@@ -15,14 +15,20 @@
                 placeholder="Enter product name" required>
             </div>
 
-            <!-- Price & Category -->
-            <div class="col-md-6">
+            <!-- Price, Quantity & Category -->
+            <div class="col-md-4">
               <label class="form-label fw-semibold">Price (EGP)</label>
               <input v-model="product.price" type="number" step="0.01" class="form-control form-control-lg"
                 placeholder="Enter price" required>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">Quantity</label>
+              <input v-model="product.quantity" type="number" min="0" class="form-control form-control-lg"
+                placeholder="Enter quantity" required>
+            </div>
+
+            <div class="col-md-4">
               <label class="form-label fw-semibold">Category</label>
               <div class="input-group">
                 <select v-model="product.categoryId" class="form-select form-select-lg" required>
@@ -148,6 +154,11 @@ const validateForm = () => {
   
   if (!product.value.categoryId) {
     showErrorToast('Please select a category')
+    return false
+  }
+  
+  if (product.value.quantity === '' || isNaN(product.value.quantity) || product.value.quantity < 0) {
+    showErrorToast('Please enter a valid quantity')
     return false
   }
   

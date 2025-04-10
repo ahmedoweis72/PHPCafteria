@@ -61,7 +61,7 @@
                     <i class="bi bi-pencil-square me-2"></i>Edit
                   </button>
                   <button 
-                    @click="deleteProduct(product.id)" 
+                    @click="showDeleteModal(product)" 
                     class="btn btn-sm btn-outline-danger"
                   >
                     <i class="bi bi-trash3 me-2"></i>Delete
@@ -81,15 +81,51 @@
       </div>
     </div>
   </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true" ref="deleteModalEl">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold text-danger" id="deleteModalLabel">Confirm Deletion</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body py-4">
+          <div class="d-flex align-items-center mb-3">
+            <div class="bg-danger-subtle p-3 rounded-circle me-3">
+              <i class="bi bi-exclamation-triangle text-danger fs-4"></i>
+            </div>
+            <div>
+              <p class="mb-0 fw-semibold">Are you sure you want to delete this product?</p>
+              <p class="mb-0 text-muted" v-if="productToDelete">{{ productToDelete.name }}</p>
+            </div>
+          </div>
+          <p class="text-muted mb-0">This action cannot be undone. All data associated with this product will be permanently removed from the system.</p>
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            <i class="bi bi-x me-2"></i>Cancel
+          </button>
+          <button type="button" class="btn btn-danger" @click="confirmDelete">
+            <i class="bi bi-trash3 me-2"></i>Delete Product
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
+import { Modal } from 'bootstrap'
 
 const products = ref([])
 const router = useRouter()
+const deleteModalEl = ref(null)
+const deleteModal = ref(null)
+const productToDelete = ref(null)
 
 const fetchProducts = async () => {
   try {
@@ -101,14 +137,20 @@ const fetchProducts = async () => {
   }
 }
 
-const deleteProduct = async (id) => {
-  if (confirm('Are you sure you want to delete this product?')) {
-    try {
-      await axios.delete(`http://localhost/PHP_Cafeteria_Backend/public/products/${id}`)
-      products.value = products.value.filter(product => product.id !== id)
-    } catch (error) {
-      console.error('Delete failed:', error)
-    }
+const showDeleteModal = (product) => {
+  productToDelete.value = product
+  deleteModal.value.show()
+}
+
+const confirmDelete = async () => {
+  try {
+    await axios.delete(`http://localhost/PHP_Cafeteria_Backend/public/products/${productToDelete.value.id}`)
+    products.value = products.value.filter(product => product.id !== productToDelete.value.id)
+    deleteModal.value.hide()
+    // Optional: Show success toast notification here
+  } catch (error) {
+    console.error('Delete failed:', error)
+    // Optional: Show error toast notification here
   }
 }
 
@@ -116,7 +158,11 @@ const editProduct = (id) => {
   router.push(`/edit-product/${id}`)
 }
 
-onMounted(fetchProducts)
+onMounted(() => {
+  fetchProducts()
+  // Initialize Bootstrap modal
+  deleteModal.value = new Modal(deleteModalEl.value)
+})
 </script>
 
 <style scoped>
@@ -131,5 +177,10 @@ onMounted(fetchProducts)
   background-color: #fff;
   border: 1px solid #dee2e6;
   border-radius: 0.5rem;
+}
+.modal-content {
+  border: none;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 </style>
