@@ -8,7 +8,7 @@ const products = ref([]);
 // when load page take product from API
 const fetchProducts = async () => {
   try {
-    const response = await fetch("http://localhost:5000/?endpoint=products");
+    const response = await fetch("http://localhost/PHP_Cafeteria_Backend/public/products");
     products.value = await response.json();
   } catch (error) {
     console.error("Error fetching products:", error);
