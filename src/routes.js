@@ -4,6 +4,7 @@ import AllProductComponent from './views/AllProductComponent.vue'
 import UsersComponent from './views/UsersComponent.vue';
 import NotFound from './views/NotFound.vue'
 import AddCategoryComponent from './views/AddCategoryComponent.vue'
+import UpdateUserComponent from './views/UpdateUserComponent.vue';
 import EditProductComponent from './views/EditProductComponent.vue';
 
 
@@ -14,6 +15,11 @@ const routes = [
     //     component:HeaderComponent
 
     // },
+    {
+        path:'/updateUser/:id',
+        name:'updateUser',
+        component:UpdateUserComponent
+    },
     {
         path:'/users',
         name:'All users',
