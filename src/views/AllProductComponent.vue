@@ -11,8 +11,11 @@
     </div>
 
     <div class="card shadow-sm">
-      <div class="card-header bg-white border-bottom">
+      <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
         <h2 class="h5 mb-0 text-secondary">Product Inventory</h2>
+        <div>
+          <span class="text-muted">{{ paginatedProducts.length }} of {{ products.length }} products</span>
+        </div>
       </div>
       
       <div class="table-responsive">
@@ -27,7 +30,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="product in products" :key="product.id">
+            <tr v-for="product in paginatedProducts" :key="product.id">
               <td class="align-middle fw-semibold">{{ product.name }}</td>
               <td class="align-middle">{{ product.price }} EGP</td>
               <td class="align-middle text-center">
@@ -79,6 +82,23 @@
           Add Your First Product
         </router-link>
       </div>
+      
+      <!-- Simple Pagination Controls -->
+      <div v-if="products.length > 0" class="card-footer bg-white border-top py-3">
+        <nav aria-label="Product pagination">
+          <ul class="pagination justify-content-center mb-0">
+            <li class="page-item" :class="{ disabled: currentPage === 1 }">
+              <a class="page-link" href="#" @click.prevent="changePage(currentPage - 1)">Previous</a>
+            </li>
+            <li class="page-item active">
+              <a class="page-link" href="#">{{ currentPage }}</a>
+            </li>
+            <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+              <a class="page-link" href="#" @click.prevent="changePage(currentPage + 1)">Next</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
     </div>
   </div>
 
@@ -116,7 +136,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 import { Modal } from 'bootstrap'
@@ -126,6 +146,11 @@ const router = useRouter()
 const deleteModalEl = ref(null)
 const deleteModal = ref(null)
 const productToDelete = ref(null)
+
+// Pagination state
+const currentPage = ref(1)
+const perPage = ref(10)
+const totalPages = computed(() => Math.ceil(products.value.length / perPage.value))
 
 const fetchProducts = async () => {
   try {
@@ -158,6 +183,19 @@ const editProduct = (id) => {
   router.push(`/edit-product/${id}`)
 }
 
+// Computed property for paginated products
+const paginatedProducts = computed(() => {
+  const start = (currentPage.value - 1) * perPage.value
+  const end = start + perPage.value
+  return products.value.slice(start, end)
+})
+
+// Change page function
+const changePage = (page) => {
+  if (page < 1 || page > totalPages.value) return
+  currentPage.value = page
+}
+
 onMounted(() => {
   fetchProducts()
   // Initialize Bootstrap modal
@@ -182,5 +220,39 @@ onMounted(() => {
   border: none;
   border-radius: 0.75rem;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Simple pagination styling */
+.pagination {
+  display: flex;
+  padding-left: 0;
+  list-style: none;
+}
+
+.page-item:not(:first-child) .page-link {
+  margin-left: -1px;
+}
+
+.page-link {
+  position: relative;
+  display: block;
+  padding: 0.5rem 0.75rem;
+  text-decoration: none;
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+}
+
+.page-item.active .page-link {
+  z-index: 3;
+  color: #fff;
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+.page-item.disabled .page-link {
+  color: #6c757d;
+  pointer-events: none;
+  background-color: #fff;
+  border-color: #dee2e6;
 }
 </style>
