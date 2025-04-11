@@ -76,126 +76,128 @@
       </form>
     </div>
   </template>
-  
+
   <script setup>
-  import { ref, onMounted } from 'vue'
-  import { useRouter, useRoute } from 'vue-router'
-  import { toast } from 'vue3-toastify'
-  import 'vue3-toastify/dist/index.css'
-  import { useProductStore } from '../stores/productStore'
-  import { useCategoryStore } from '../stores/categoryStore'
-  
-  const router = useRouter()
-  const route = useRoute()
-  const productId = route.params.id
-  
-  const productStore = useProductStore()
-  const categoryStore = useCategoryStore()
-  
-  const product = ref({
-    id: null,
-    name: '',
-    price: 0,
-    description: '',
-    quantity: 0,
-    categoryId: null,
-    image: ''
-  })
-  
-  const imageFile = ref(null)
-  const imagePreview = ref(null)
-  const loading = ref(true)
-  const submitting = ref(false)
-  const errorMsg = ref(null)
-  
-  onMounted(async () => {
-    try {
-      await Promise.all([
-        loadProduct(),
-        categoryStore.fetchCategories()
-      ])
-    } catch (err) {
-      handleError(err, 'Failed to load data')
-    } finally {
-      loading.value = false
-    }
-  })
-  
-  const loadProduct = async () => {
-    try {
-      const data = await productStore.fetchProduct(productId)
-      product.value = { 
-        ...data,
-        categoryId: data.category_id || data.categoryId // Handle both naming conventions
-      }
-    } catch (err) {
-      throw err
-    }
-  }
-  
-  const handleImageChange = (event) => {
-    const file = event.target.files[0]
-    if (file) {
-      imageFile.value = file
-      const reader = new FileReader()
-      reader.onload = () => imagePreview.value = reader.result
-      reader.readAsDataURL(file)
-    } else {
-      imageFile.value = null
-      imagePreview.value = null
-    }
-  }
-  
-  const updateProduct = async () => {
-  submitting.value = true;
-  errorMsg.value = null;
-  
+import { ref, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
+import { useProductStore } from '../stores/productStore'
+import { useCategoryStore } from '../stores/categoryStore'
+
+const router = useRouter()
+const route = useRoute()
+const productId = route.params.id
+
+const productStore = useProductStore()
+const categoryStore = useCategoryStore()
+
+const product = ref({
+  id: null,
+  name: '',
+  price: 0,
+  description: '',
+  quantity: 0,
+  categoryId: null,
+  image: ''
+})
+
+const imageFile = ref(null)
+const imagePreview = ref(null)
+const loading = ref(true)
+const submitting = ref(false)
+const errorMsg = ref(null)
+
+onMounted(async () => {
   try {
-    const formData = new FormData();
-    
-    // Validate required fields before sending
-    if (!product.value.name || !product.value.price || !product.value.categoryId) {
-      throw new Error('Missing required fields: name, price, or category');
-    }
-
-    // Append required fields
-    formData.append('name', product.value.name.trim());
-    formData.append('price', Number(product.value.price).toFixed(2)); // Ensure 2 decimal places
-    formData.append('categoryId', String(product.value.categoryId)); // Convert to string for PHP casting
-
-    // Append optional fields only if they exist
-    if (product.value.description) {
-      formData.append('description', product.value.description.trim());
-    }
-    if (product.value.quantity) {
-      formData.append('quantity', String(product.value.quantity));
-    }
-    
-    // Handle file upload
-    if (imageFile.value) {
-      formData.append('image', imageFile.value);
-    }
-
-    // Use POST with correct endpoint
-    await productStore.updateProduct(productId, formData);
-    
-    toast.success('Product updated successfully!');
-    router.push({ name: 'products' });
+    await Promise.all([
+      loadProduct(),
+      categoryStore.fetchCategories()
+    ])
   } catch (err) {
-    handleError(err, 'Failed to update product');
+    handleError(err, 'Failed to load data')
   } finally {
-    submitting.value = false;
+    loading.value = false
   }
-};
-  
-  const handleError = (err, defaultMessage) => {
-    const message = err.response?.data?.message || err.message || 'Unknown error occurred'
-    errorMsg.value = `${defaultMessage}: ${message}`
-    toast.error(errorMsg.value)
-    console.error(err)
+})
+
+const loadProduct = async () => {
+  try {
+    const data = await productStore.fetchProduct(productId)
+    product.value = { 
+      ...data,
+      categoryId: data.category_id || data.categoryId
+    }
+  } catch (err) {
+    throw err
   }
-  </script>
-  
+}
+
+const handleImageChange = (event) => {
+  const file = event.target.files[0]
+  if (file) {
+    imageFile.value = file
+    const reader = new FileReader()
+    reader.onload = () => imagePreview.value = reader.result
+    reader.readAsDataURL(file)
+  }
+}
+
+const updateProduct = async () => {
+  submitting.value = true
+  errorMsg.value = null
+
+  try {
+    // Validate required fields
+    if (!product.value.name || !product.value.price || !product.value.categoryId) {
+      throw new Error('Name, price, and category are required fields')
+    }
+    
+    if (product.value.price <= 0) {
+      throw new Error('Price must be greater than 0')
+    }
+    
+    if (product.value.quantity < 0) {
+      throw new Error('Quantity cannot be negative')
+    }
+
+    const formData = new FormData()
+    formData.append('_method', 'PUT')
+    formData.append('name', product.value.name.trim())
+    formData.append('price', Number(product.value.price).toFixed(2))
+    formData.append('category', String(product.value.categoryId))
+    
+    if (product.value.description) {
+      formData.append('description', product.value.description.trim())
+    }
+    
+    formData.append('quantity', String(Math.max(0, product.value.quantity)))
+    
+    if (imageFile.value) {
+      formData.append('image', imageFile.value)
+    }
+
+    await productStore.updateProduct(productId, formData)
+    
+    toast.success('Product updated successfully!')
+    setTimeout(() => {
+        router.push('/all-product')
+      }, 1000)
+  } catch (err) {
+    handleError(err, 'Failed to update product')
+  } finally {
+    submitting.value = false
+  }
+}
+
+const handleError = (err, defaultMessage) => {
+  const message = err.response?.data?.message || err.message || 'Unknown error'
+  errorMsg.value = `${defaultMessage}: ${message}`
+  toast.error(errorMsg.value)
+  console.error(err)
+}
+</script>
+
   <style scoped>
   .product-edit {
     max-width: 800px;

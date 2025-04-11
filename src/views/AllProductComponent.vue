@@ -44,8 +44,8 @@
               </td>
               <td class="align-middle text-center">
                 <span 
-                  :class="product.status === 'available' 
-                    ? 'badge bg-success-subtle text-success' 
+                  :class="product.status === 'available'
+                    ? 'badge bg-success-subtle text-success'
                     : 'badge bg-danger-subtle text-danger'"
                   style="font-size: 0.9em"
                 >
@@ -55,13 +55,13 @@
               <td class="align-middle text-end">
                 <div class="d-flex gap-2 justify-content-end">
                   <button 
-                    @click="editProduct(product.id)" 
+                    @click="editProduct(product.id)"
                     class="btn btn-sm btn-outline-primary"
                   >
                     <i class="bi bi-pencil-square me-2"></i>Edit
                   </button>
                   <button 
-                    @click="showDeleteModal(product)" 
+                    @click="showDeleteModal(product)"
                     class="btn btn-sm btn-outline-danger"
                   >
                     <i class="bi bi-trash3 me-2"></i>Delete
