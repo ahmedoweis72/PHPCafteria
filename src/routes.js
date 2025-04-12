@@ -6,6 +6,7 @@ import NotFound from './views/NotFound.vue'
 import AddCategoryComponent from './views/AddCategoryComponent.vue'
 import UpdateUserComponent from './views/UpdateUserComponent.vue';
 import EditProductComponent from './views/EditProductComponent.vue';
+import CheckComponent from './views/CheckComponent.vue';
 
 
 const routes = [
@@ -45,6 +46,11 @@ const routes = [
         path: '/edit-product/:id',
         name: 'edit',
         component: EditProductComponent
+    },
+    {
+        path:'/checks',
+        name:'checks',
+        component:CheckComponent
     },
     {
         path: '/:pathMatch(.*)*',
