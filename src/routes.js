@@ -6,16 +6,15 @@ import NotFound from './views/NotFound.vue'
 import AddCategoryComponent from './views/AddCategoryComponent.vue'
 import UpdateUserComponent from './views/UpdateUserComponent.vue';
 import EditProductComponent from './views/EditProductComponent.vue';
-import HeaderComponent from './views/HeaderComponent.vue';
 import OrdersList from './views/OrdersList.vue';
 import OrderDetails from './views/OrderDetails.vue';
-import HomeComponent from './views/HomeComponent.vue';
+import HomeComponent from './views/HomeView.vue';
 
 const routes = [
     {
         path:'/',
         name:'Home-page',
-        component:HeaderComponent
+        component:HomeComponent
 
     },
     {
@@ -60,16 +59,17 @@ const routes = [
       component: OrdersList,
     },
     {
-      path: '/orders/:id',
+      path: '/orders/:id/details',
       name: 'OrderDetails',
       component: OrderDetails,
       props: true, // for passing route params as props
     },
+
 ]
 
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(),
   routes,
 });
 

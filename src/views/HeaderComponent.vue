@@ -19,8 +19,6 @@ const user = {
               </li>
               <li class="nav-item">
               
-                <router-link to="/add-product" class="nav-link">Products</router-link>
-
                 <router-link to="/all-product" class="nav-link">Products</router-link>
                 
               </li>

@@ -9,6 +9,8 @@ const products = ref([]);
 const fetchProducts = async () => {
   try {
     const response = await fetch("http://localhost/PHP_Cafeteria_Backend/public/products");
+    console.log(response);
+    
     products.value = await response.json();
   } catch (error) {
     console.error("Error fetching products:", error);
