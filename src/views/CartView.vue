@@ -1,59 +1,109 @@
-<script setup>
-import { useCartStore } from "./../stores/cartStore";
-import { computed } from "vue";
-
-const cartStore = useCartStore();
-
-// remove item from cart 
-const removeFromCart = (productId) => {
-  cartStore.cart = cartStore.cart.filter((item) => item.id !== productId);
-  localStorage.setItem("cart", JSON.stringify(cartStore.cart));
-};
-
-// update quantity 
-const updateQuantity = (product, amount) => {
-  product.quantity += amount;
-  if (product.quantity < 1) {
-    removeFromCart(product.id);
-  } else {
-    localStorage.setItem("cart", JSON.stringify(cartStore.cart));
-  }
-};
-
-// total price 
-const totalPrice = computed(() =>
-  cartStore.cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
-);
-</script>
-
 <template>
-  <div class="container mx-auto py-6">
-    <h1 class="text-2xl font-bold mb-4">🛒</h1>
-
-    <div v-if="cartStore.cart.length">
-      <div v-for="product in cartStore.cart" :key="product.id" class="flex justify-between items-center border-b p-4">
-        <div class="flex items-center gap-4">
-          <img :src="`/images/${product.image}`" :alt="product.name" class="w-20 h-20 object-cover rounded-md" />
-          <div>
-            <h2 class="text-lg font-semibold">{{ product.name }}</h2>
-            <p class="text-gray-600">{{ product.price }} USA</p>
-          </div>
-        </div>
-
-        <div class="flex items-center gap-4">
-          <button @click="updateQuantity(product, -1)" class="px-2 py-1 bg-gray-300 rounded">-</button>
-          <span class="font-bold">{{ product.quantity }}</span>
-          <button @click="updateQuantity(product, 1)" class="px-2 py-1 bg-gray-300 rounded">+</button>
-          <button @click="removeFromCart(product.id)" class="px-2 py-1 bg-red-500 text-white rounded">🗑</button>
-        </div>
-      </div>
-
-      <div class="mt-6 text-right">
-        <h3 class="text-xl font-bold">Total: {{ totalPrice }} USA</h3>
-        <button class="mt-2 px-4 py-2 bg-green-500 text-white rounded">Confirm</button>
-      </div>
+  <div class="container">
+    <h3>Your Shopping Cart</h3>
+    
+    
+    <div v-if="cart.length === 0">
+      <p>Your cart is empty.</p>
     </div>
 
-    <p v-else class="text-gray-500 text-center mt-10"> 🛒</p>
+   
+    <div v-else>
+      <div class="row">
+        <div class="col-md-4 mb-4" v-for="item in cart" :key="item.id">
+          <div class="card h-100">
+            <img :src="item.image" class="card-img-top" alt="Product Image">
+            <div class="card-body">
+              <h5 class="card-title">{{ item.name }}</h5>
+              <p class="card-text"><strong>Price:</strong> ${{ item.price }}</p>
+              
+              
+              <div class="form-group">
+                <label for="notes">Notes:</label>
+                <textarea v-model="item.notes" class="form-control" id="notes" rows="2"></textarea>
+              </div>
+
+              
+              <div class="d-flex justify-content-between align-items-center">
+                <button class="btn btn-secondary btn-sm" @click="decreaseQuantity(item)">-</button>
+                <span class="font-weight-bold">Quantity: {{ item.quantity || 1 }}</span>
+                <button class="btn btn-secondary btn-sm" @click="increaseQuantity(item)">+</button>
+              </div>
+
+              <button class="btn btn-danger btn-sm float-right mt-2" @click="removeFromCart(item)">Remove</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="d-flex justify-content-between mt-3">
+        <p><strong>Total:</strong> ${{ totalPrice }}</p>
+        <button class="btn btn-success" @click="confirmOrder">Confirm Order</button>
+      </div>
+    </div>
   </div>
 </template>
+
+<script>
+export default {
+  computed: {
+    
+    totalPrice() {
+      return this.cart.reduce((total, item) => total + (parseFloat(item.price) * (item.quantity || 1)), 0).toFixed(2);
+    }
+  },
+  data() {
+    return {
+      cart: JSON.parse(localStorage.getItem('cart')) || []  
+    };
+  },
+  methods: {
+    increaseQuantity(item) {
+      item.quantity = (item.quantity || 1) + 1;
+      this.updateLocalStorage();
+    },
+    decreaseQuantity(item) {
+      if (item.quantity > 1) {
+        item.quantity--;
+        this.updateLocalStorage();
+      }
+    },
+    removeFromCart(item) {
+      const index = this.cart.indexOf(item);
+      if (index !== -1) {
+        this.cart.splice(index, 1);
+        this.updateLocalStorage();
+      }
+    },
+    clearCart() {
+      this.cart = [];
+      this.updateLocalStorage();
+    },
+    updateLocalStorage() {
+      localStorage.setItem('cart', JSON.stringify(this.cart));
+    },
+    confirmOrder() {
+      
+      console.log('Order confirmed:', this.cart);
+      
+      this.clearCart();
+    }
+  }
+};
+</script>
+
+<style scoped>
+.card-img-top {
+  height: 200px;
+  object-fit: cover;
+}
+
+textarea {
+  font-size: 0.9rem;
+}
+
+button {
+  font-size: 0.9rem;
+}
+</style>

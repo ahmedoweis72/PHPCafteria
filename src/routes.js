@@ -10,8 +10,8 @@ import OrdersList from './views/OrdersList.vue';
 import OrderDetails from './views/OrderDetails.vue';
 import HomeComponent from './views/HomeView.vue';
 import CheckComponent from './views/CheckComponent.vue';
-
-
+import UserOrder from './views/UserOrder.vue';
+import CartView from './views/CartView.vue';
 const routes = [
     {
         path:'/',
@@ -70,6 +70,17 @@ const routes = [
       name: 'OrderDetails',
       component: OrderDetails,
       props: true, // for passing route params as props
+    },
+    {
+        path: '/order',
+        name: 'UserOrder',
+        component: UserOrder,
+    },
+    {
+        path:'/cart',
+        name:'CartView',
+        component:CartView
+
     },
 
 ]

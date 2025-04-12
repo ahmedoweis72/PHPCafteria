@@ -1,45 +1,112 @@
-<script setup>
-import { ref, onMounted } from "vue";
-import { useCartStore } from "./../stores/cartStore";
-
-const cartStore = useCartStore();
-const products = ref([]);
-
-// when load page take product from API
-const fetchProducts = async () => {
-  try {
-    const response = await fetch("http://localhost/PHP_Cafeteria_Backend/public/products");
-    console.log(response);
-    
-    products.value = await response.json();
-  } catch (error) {
-    console.error("Error fetching products:", error);
-  }
-};
-
-// load product when page loaded 
-onMounted(fetchProducts);
-</script>
-
 <template>
-  <div class="container mx-auto py-6">
-    <h1 class="text-2xl font-bold mb-4">Drinks List </h1>
+  <div class="container my-4">
+    
+    <div class="col-md-3 mb-3">
+      <select v-model="selectedCategory" class="form-control">
+        <option value="">All Categories</option>
+        <option value="Hot Drinks">Hot Drinks</option>
+        <option value="Cold Drinks">Cold Drinks</option>
+        <option value="Snacks">Snacks</option>
+       
+      </select>
+    </div>
 
-    <div class="grid grid-cols-3 gap-4">
-      <div v-for="product in products" :key="product.id" class="p-4 border rounded-lg shadow-lg text-center">
-        <img :src="`/images/${product.image}`" :alt="product.name" class="w-full h-40 object-cover rounded-md" />
-        <h2 class="mt-2 text-lg font-semibold">{{ product.name }}</h2>
-        <p class="text-gray-600">{{ product.price }} USA</p>
-        <button  class="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          @click="cartStore.addToCart(product)"> 
-          Add to order </button>
+    
+    <div class="row">
+      <div class="col-md-4 mb-4" v-for="product in filteredProducts" :key="product.id">
+        <div class="card h-100">
+          <img :src="product.image" class="card-img-top" alt="Product Image">
+          <div class="card-body">
+            <h5 class="card-title">{{ product.name }}</h5>
+            <p class="card-text">{{ product.description }}</p>
+            <p class="card-text"><strong>Price:</strong> ${{ product.price }}</p>
+            <p class="card-text"><strong>Status:</strong> {{ product.status === 'available' ? 'In Stock' : 'Out of Stock' }}</p>
+            <button class="btn btn-primary" @click="addToCart(product)">Add to Cart</button>
+          </div>
+        </div>
       </div>
+    </div>
+
+    
+    <div v-if="cart.length > 0" class="cart mt-5">
+      <h4>Shopping Cart</h4>
+      <ul class="list-group">
+        <li class="list-group-item" v-for="item in cart" :key="item.id">
+          <strong>{{ item.name }}</strong> - ${{ item.price }}
+          <button class="btn btn-danger btn-sm float-right" @click="removeFromCart(item)">Remove</button>
+        </li>
+      </ul>
+      <p><strong>Total:</strong> ${{ totalPrice }}</p>
+      <button class="btn btn-warning" @click="clearCart">Clear Cart</button>
     </div>
   </div>
 </template>
 
-<style scoped>
-.container {
-  max-width: 900px;
-}
-</style>
+<script>
+import axios from 'axios';
+
+export default {
+  data() {
+    return {
+      products: [],  
+      selectedCategory: '',  
+      cart: JSON.parse(localStorage.getItem('cart')) || []  
+    };
+  },
+  computed: {
+   
+    filteredProducts() {
+      if (!this.selectedCategory) {
+        return this.products;  
+      }
+      return this.products.filter(product => product.category_name === this.selectedCategory);
+    },
+    
+    totalPrice() {
+      return this.cart.reduce((total, item) => total + parseFloat(item.price), 0).toFixed(2);
+    },
+    
+    cartCount() {
+      return this.cart.length;
+    }
+  },
+  mounted() {
+    
+    axios.get('http://localhost/PHP_Cafeteria_Backend/public/products')
+      .then(response => {
+        if (Array.isArray(response.data)) {
+          this.products = response.data;  
+        } else {
+          console.error("The response is not an array:", response.data);
+        }
+      })
+      .catch(error => {
+        console.error("There was an error fetching the products:", error);
+      });
+  },
+  methods: {
+    addToCart(product) {
+      
+      this.cart.push(product);
+     
+      localStorage.setItem('cart', JSON.stringify(this.cart));
+      console.log('Added to cart:', product);
+    },
+    removeFromCart(item) {
+      
+      const index = this.cart.indexOf(item);
+      if (index !== -1) {
+        this.cart.splice(index, 1);
+        
+        localStorage.setItem('cart', JSON.stringify(this.cart));
+      }
+    },
+    clearCart() {
+      
+      this.cart = [];
+      
+      localStorage.setItem('cart', JSON.stringify(this.cart));
+    }
+  }
+};
+</script>

@@ -1,11 +1,3 @@
-<script setup>
-const user = {
-  name: "John Doe",
-  role: "Admin",
-  image: "https://cdn.pixabay.com/photo/2020/07/01/12/58/icon-5359553_640.png"
-};
-</script>
-
 <template>
   <header class="shadow-sm bg-light w-100 vw-100">
     <div class="container-fluid py-3">
@@ -18,9 +10,7 @@ const user = {
                 <router-link to="/" class="nav-link">Home</router-link>
               </li>
               <li class="nav-item">
-              
                 <router-link to="/all-product" class="nav-link">Products</router-link>
-
               </li>
               <li class="nav-item">
                 <router-link to="/users" class="nav-link">Users</router-link>
@@ -33,6 +23,13 @@ const user = {
               </li>
             </ul>
           </nav>
+          <div class="cart-icon">
+            <!-- Button now directly triggers a navigation to the Cart component -->
+            <router-link to="/cart" class="nav-link">
+              <i class="fa fa-shopping-cart"></i>
+              <span class="badge badge-pill badge-primary">{{ cartCount }}</span> <!-- عرض عدد المنتجات في السلة -->
+            </router-link>
+          </div>
         </div>
 
         <div class="col-auto d-flex align-items-center">
@@ -46,6 +43,26 @@ const user = {
     </div>
   </header>
 </template>
+
+<script setup>
+import { ref, onMounted } from 'vue';
+
+
+const user = {
+  name: "John Doe",
+  role: "Admin",
+  image: "https://cdn.pixabay.com/photo/2020/07/01/12/58/icon-5359553_640.png"
+};
+
+
+const cartCount = ref(0);
+
+
+onMounted(() => {
+  const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+  cartCount.value = cartItems.length;
+});
+</script>
 
 <style scoped>
 /* Override Bootstrap's active link color */
