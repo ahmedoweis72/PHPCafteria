@@ -20,7 +20,7 @@ const user = {
               <li class="nav-item">
               
                 <router-link to="/all-product" class="nav-link">Products</router-link>
-                
+
               </li>
               <li class="nav-item">
                 <router-link to="/users" class="nav-link">Users</router-link>
@@ -34,7 +34,7 @@ const user = {
             </ul>
           </nav>
         </div>
-        
+
         <div class="col-auto d-flex align-items-center">
           <div class="text-end me-3">
             <div class="fw-bold">{{ user.name }}</div>

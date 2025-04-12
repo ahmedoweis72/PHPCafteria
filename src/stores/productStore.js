@@ -27,7 +27,8 @@ export const useProductStore = defineStore('product', {
         if (product.imageFile) {
           formData.append('image', product.imageFile)
         }
-
+        console.log(formData);
+        
         const response = await axios.post(
           'http://localhost/PHP_Cafeteria_Backend/public/products',
           formData,
@@ -50,30 +51,30 @@ export const useProductStore = defineStore('product', {
     
     async updateProduct(id, formData) {
       try {
-        // Use POST with method override for better compatibility
+        this.isLoading = true
         const response = await axios.post(
           `http://localhost/PHP_Cafeteria_Backend/public/products/${id}`,
           formData,
           {
             headers: {
-              'Content-Type': 'multipart/form-data',
-              'X-HTTP-Method-Override': 'PUT'
+              'Content-Type': 'multipart/form-data'
             }
           }
-        );
+        )
+        return response.data
       } catch (error) {
-        this.error = error.response?.data?.message || error.message;
-        throw error;
+        this.error = error.response?.data?.message || error.message
+        throw error
       } finally {
-        this.isLoading = false;
+        this.isLoading = false
       }
     },
+    
 
     async fetchProduct(id) {
       this.isLoading = true
       this.error = null
       try {
-        console.log(id);
         const response = await axios.get(
           
           `http://localhost/PHP_Cafeteria_Backend/public/products/${id}`
@@ -89,3 +90,5 @@ export const useProductStore = defineStore('product', {
     },
   }
 })
+
+

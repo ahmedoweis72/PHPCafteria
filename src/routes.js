@@ -9,6 +9,8 @@ import EditProductComponent from './views/EditProductComponent.vue';
 import OrdersList from './views/OrdersList.vue';
 import OrderDetails from './views/OrderDetails.vue';
 import HomeComponent from './views/HomeView.vue';
+import CheckComponent from './views/CheckComponent.vue';
+
 
 const routes = [
     {
@@ -49,6 +51,11 @@ const routes = [
         component: EditProductComponent
     },
     {
+        path:'/checks',
+        name:'checks',
+        component:CheckComponent
+    },
+    {
         path: '/:pathMatch(.*)*',
         name: 'not-found',
         component: NotFound
@@ -66,7 +73,6 @@ const routes = [
     },
 
 ]
-
 
 const router = createRouter({
   history: createWebHistory(),
