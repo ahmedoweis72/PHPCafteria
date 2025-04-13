@@ -7,6 +7,7 @@ import AddCategoryComponent from './views/AddCategoryComponent.vue'
 import UpdateUserComponent from './views/UpdateUserComponent.vue';
 import EditProductComponent from './views/EditProductComponent.vue';
 import CheckComponent from './views/CheckComponent.vue';
+import OrderComponent from './views/OrderComponent.vue';
 
 
 const routes = [
@@ -25,6 +26,11 @@ const routes = [
         path:'/users',
         name:'All users',
         component:UsersComponent
+    },
+    {
+        path:'/order',
+        name:'Make Order',
+        component:OrderComponent
     },
     {
         path: '/add-product',

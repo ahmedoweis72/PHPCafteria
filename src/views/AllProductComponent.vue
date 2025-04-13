@@ -2,10 +2,7 @@
   <div class="container-fluid p-4 bg-light min-vh-100">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h1 class="h2 fw-bold text-primary">Product Management</h1>
-      <router-link 
-        to="/add-product" 
-        class="btn btn-primary btn-lg"
-      >
+      <router-link to="/add-product" class="btn btn-primary btn-lg">
         <i class="bi bi-plus-circle me-2"></i>Add Product
       </router-link>
     </div>
@@ -17,7 +14,7 @@
           <span class="text-muted">{{ paginatedProducts.length }} of {{ products.length }} products</span>
         </div>
       </div>
-      
+
       <div class="table-responsive">
         <table class="table table-hover mb-0">
           <thead class="table-light">
@@ -35,38 +32,24 @@
               <td class="align-middle">{{ product.price }} EGP</td>
               <td class="align-middle text-center">
                 <div class="d-flex justify-content-center">
-                  <img 
-                    v-if="product.image" 
-                    :src="product.image" 
-                    class="img-thumbnail rounded" 
-                    style="max-width: 80px; height: auto"
-                    alt="Product image"
-                  >
+                  <img v-if="product.image" :src="product.image" class="img-thumbnail rounded"
+                    style="max-width: 80px; height: auto" alt="Product image">
                   <span v-else class="text-muted fs-4">📦</span>
                 </div>
               </td>
               <td class="align-middle text-center">
-                <span 
-                  :class="product.status === 'available'
-                    ? 'badge bg-success-subtle text-success'
-                    : 'badge bg-danger-subtle text-danger'"
-                  style="font-size: 0.9em"
-                >
+                <span :class="product.status === 'available'
+                  ? 'badge bg-success-subtle text-success'
+                  : 'badge bg-danger-subtle text-danger'" style="font-size: 0.9em">
                   {{ product.status }}
                 </span>
               </td>
               <td class="align-middle text-end">
                 <div class="d-flex gap-2 justify-content-end">
-                  <button 
-                    @click="editProduct(product.id)"
-                    class="btn btn-sm btn-outline-primary"
-                  >
+                  <button @click="editProduct(product.id)" class="btn btn-sm btn-outline-primary">
                     <i class="bi bi-pencil-square me-2"></i>Edit
                   </button>
-                  <button 
-                    @click="showDeleteModal(product)"
-                    class="btn btn-sm btn-outline-danger"
-                  >
+                  <button @click="showDeleteModal(product)" class="btn btn-sm btn-outline-danger">
                     <i class="bi bi-trash3 me-2"></i>Delete
                   </button>
                 </div>
@@ -82,7 +65,7 @@
           Add Your First Product
         </router-link>
       </div>
-      
+
       <!-- Simple Pagination Controls -->
       <div v-if="products.length > 0" class="card-footer bg-white border-top py-3">
         <nav aria-label="Product pagination">
@@ -103,7 +86,8 @@
   </div>
 
   <!-- Delete Confirmation Modal -->
-  <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true" ref="deleteModalEl">
+  <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true"
+    ref="deleteModalEl">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header border-0 pb-0">
@@ -120,7 +104,8 @@
               <p class="mb-0 text-muted" v-if="productToDelete">{{ productToDelete.name }}</p>
             </div>
           </div>
-          <p class="text-muted mb-0">This action cannot be undone. All data associated with this product will be permanently removed from the system.</p>
+          <p class="text-muted mb-0">This action cannot be undone. All data associated with this product will be
+            permanently removed from the system.</p>
         </div>
         <div class="modal-footer border-0 pt-0">
           <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
@@ -151,12 +136,13 @@ const productToDelete = ref(null)
 const currentPage = ref(1)
 const perPage = ref(10)
 const totalPages = computed(() => Math.ceil(products.value.length / perPage.value))
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost/PHP_Cafeteria_Backend/public';
 
 const fetchProducts = async () => {
   try {
-    const response = await axios.get('http://localhost/PHP_Cafeteria_Backend/public/products')
+    const response = await axios.get(`${API_URL}/products`)
     products.value = response.data;
-    
+
   } catch (error) {
     console.error('Error fetching products:', error)
   }
@@ -169,7 +155,7 @@ const showDeleteModal = (product) => {
 
 const confirmDelete = async () => {
   try {
-    await axios.delete(`http://localhost/PHP_Cafeteria_Backend/public/products/${productToDelete.value.id}`)
+    await axios.delete(`${API_URL}/products/${productToDelete.value.id}`)
     products.value = products.value.filter(product => product.id !== productToDelete.value.id)
     deleteModal.value.hide()
     // Optional: Show success toast notification here
@@ -207,15 +193,18 @@ onMounted(() => {
 .table-hover tbody tr:hover {
   background-color: rgba(0, 123, 255, 0.05);
 }
+
 .card {
   border-radius: 0.75rem;
 }
+
 .img-thumbnail {
   padding: 0.25rem;
   background-color: #fff;
   border: 1px solid #dee2e6;
   border-radius: 0.5rem;
 }
+
 .modal-content {
   border: none;
   border-radius: 0.75rem;

@@ -15,7 +15,7 @@ const users = ref([]);
 const expandedOrder = ref('');
 const expandedUser = ref('');
 
-const API_URL = 'http://localhost/PHP_Cafeteria_Backend/public';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost/PHP_Cafeteria_Backend/public';
 
 const fetchUsers = async (page = 1) => {
   try {
