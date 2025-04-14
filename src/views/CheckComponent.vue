@@ -16,7 +16,7 @@ const expandedOrder = ref('');
 const expandedUser = ref('');
 const selectedUserName = ref('');
 const loadingOrders = ref(false);
-const selectedUserOrders = ref('');
+const selectedUserOrders = ref([]);
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost/PHP_Cafeteria_Backend/public';
 
@@ -71,12 +71,12 @@ const fetchUserOrders = async (userId) => {
 //To show the orders for the user when he click on the button
 const toggleUserOrders = async (user) => {
   //To make the button toggle
-  if (expandedUser.value === user.id) {
+  if (expandedUser.value === user.user_id) {
     expandedUser.value = null;
     return;
   }
-  console.log(user);
-  expandedUser.value = user.id;
+
+  expandedUser.value = user.user_id;
   selectedUserName.value = user.fullName;
   loadingOrders.value = true;
 
@@ -84,11 +84,10 @@ const toggleUserOrders = async (user) => {
   try {
     //Fetch all orders for this user
     const response = await fetchUserOrders(user.user_id);
-    console.log(response);
+
 
     if (response && response.data) {
       selectedUserOrders.value = response.data;
-
     } else {
       selectedUserOrders.value = [];
 
@@ -197,142 +196,127 @@ const changePage = (page) => {
               </tr>
             </thead>
             <tbody>
-              <!-- User Row - Clicking expands to show their orders -->
-              <tr v-for="(user, index) in users" :key="user.id" class="user-row" data-bs-toggle="collapse"
-                data-bs-target="#orders-user-1">
-                <td>{{ index + 1 + (currentPage - 1) * 6 }}</td>
-                <td>
-                  <img
-                    :src="user.profilePicture || 'https://image.shutterstock.com/image-vector/vector-flat-illustration-grayscale-avatar-260nw-2281862025.jpg'"
-                    :alt="user.fullName" class=" rounded-circle" width="40" height="40">
-                </td>
-                <td>{{ user.fullName }}</td>
-                <td>Room {{ user.roomNum }}</td>
-                <td>{{ user.order_count || 0 }}</td>
-                <td>${{ (parseFloat(user.total_spent) || 0).toFixed(2) }}</td>
-                <td>
-                  <button @click="toggleUserOrders(user)" class="btn btn-sm btn-outline-primary"
-                    :class="{ 'active': expandedUser === user.id }">
-                    <i :class="expandedUser === user.id ? 'bi bi-chevron-up' : 'bi bi-chevron-down'"></i> {{
-                      expandedUser === user.id ? 'Hide' : 'Details' }}
-                  </button>
-                </td>
-              </tr>
+              <template v-for="(user, index) in users" :key="user.user_id">
+                <!-- User Row - Clicking expands to show their orders -->
+                <tr class="user-row">
+                  <td>{{ index + 1 + (currentPage - 1) * 6 }}</td>
+                  <td>
+                    <img
+                      :src="user.profilePicture || 'https://image.shutterstock.com/image-vector/vector-flat-illustration-grayscale-avatar-260nw-2281862025.jpg'"
+                      :alt="user.fullName" class=" rounded-circle" width="40" height="40">
+                  </td>
+                  <td>{{ user.fullName }}</td>
+                  <td>Room {{ user.roomNum }}</td>
+                  <td>{{ user.order_count || 0 }}</td>
+                  <td>${{ (parseFloat(user.total_spent) || 0).toFixed(2) }}</td>
+                  <td>
+                    <button @click="toggleUserOrders(user)" class="btn btn-sm btn-outline-primary"
+                      :class="{ 'active': expandedUser === user.user_id }">
+                      <i :class="expandedUser === user.user_id ? 'bi bi-chevron-up' : 'bi bi-chevron-down'"></i> {{
+                        expandedUser === user.user_id ? 'Hide' : 'Details' }}
+                    </button>
+                  </td>
+                </tr>
 
-              <!-- Expandable Orders Section for User 1 -->
-              <tr class="collapse-row">
-                <td colspan="7" class="p-0">
-                  <div id="orders-user-1" class="collapse">
+                <!-- Expandable Orders Section for User 1 -->
+                <tr v-if="expandedUser === user.user_id">
+                  <td colspan="7" class="p-0">
                     <div class="orders-container p-3 bg-light">
-                      <h6 class="mb-3">Orders for John Doe</h6>
+                      <div v-if="loadingOrders" class="text-center py-3">
+                        <div class="spinner-border text-primary" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2 mb-0">Loading orders...</p>
+                      </div>
+                      <div v-else>
+                        <h6 class="mb-3">Orders for {{ selectedUserName }}</h6>
 
-                      <!-- Orders Table -->
-                      <table class="table table-sm table-bordered">
-                        <thead class="table-secondary">
-                          <tr>
-                            <th>Order #</th>
-                            <th>Date</th>
-                            <th>Status</th>
-                            <th>Total</th>
-                            <th>Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <!-- Order Row - Clicking expands to show order items -->
-                          <tr class="order-row" data-bs-toggle="collapse" data-bs-target="#items-order-101">
-                            <td>101</td>
-                            <td>2024-04-12 10:30 AM</td>
-                            <td><span class="badge bg-success">Delivered</span></td>
-                            <td>$35.25</td>
-                            <td>
-                              <button class="btn btn-sm btn-outline-info">
-                                <i class="bi bi-list-ul"></i> Items
-                              </button>
-                            </td>
-                          </tr>
+                        <!-- Orders Table -->
+                        <table class="table table-sm table-bordered">
+                          <thead class="table-secondary">
+                            <tr>
+                              <th>Order #</th>
+                              <th>Date</th>
+                              <th>Status</th>
+                              <th>Total</th>
+                              <th>Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <template v-for="order in selectedUserOrders.orders" :Key="order.id">
+                              <!-- Order Row - Clicking expands to show order items -->
+                              <tr class="order-row" data-bs-toggle="collapse" data-bs-target="#items-order-101">
+                                <td>{{ order.id }}</td>
+                                <td>{{ order.created_at }}</td>
+                                <td><span class="badge bg-success">{{ order.order_status }}</span></td>
+                                <td>${{ order.total_amount }}</td>
+                                <td>
+                                  <button class="btn btn-sm btn-outline-info">
+                                    <i class="bi bi-list-ul"></i> Items
+                                  </button>
+                                </td>
+                              </tr>
 
-                          <!-- Expandable Order Items for Order 101 -->
-                          <tr class="collapse-row">
-                            <td colspan="5" class="p-0">
-                              <div id="items-order-101" class="collapse">
-                                <div class="order-items p-3 bg-white">
-                                  <h6 class="mb-3">Order Items</h6>
-                                  <div class="row g-2">
-                                    <!-- Order Item Card -->
-                                    <div class="col-md-4 col-sm-6">
-                                      <div class="card h-100">
-                                        <img src="https://via.placeholder.com/150" class="card-img-top" alt="Product">
-                                        <div class="card-body">
-                                          <h6 class="card-title">Espresso Coffee</h6>
-                                          <p class="card-text mb-1">
-                                            <small class="text-muted">Qty: 2 x $4.50</small>
-                                          </p>
-                                          <p class="fw-bold mb-0">$9.00</p>
+                              <!-- Expandable Order Items for Order 101 -->
+                              <tr class="collapse-row">
+                                <td colspan="5" class="p-0">
+                                  <div id="items-order-101" class="collapse">
+                                    <div class="order-items p-3 bg-white">
+                                      <h6 class="mb-3">Order Items</h6>
+                                      <div class="row g-2">
+                                        <!-- Order Item Card -->
+                                        <div class="col-md-4 col-sm-6">
+                                          <div class="card h-100">
+                                            <img src="https://via.placeholder.com/150" class="card-img-top"
+                                              alt="Product">
+                                            <div class="card-body">
+                                              <h6 class="card-title">Espresso Coffee</h6>
+                                              <p class="card-text mb-1">
+                                                <small class="text-muted">Qty: 2 x $4.50</small>
+                                              </p>
+                                              <p class="fw-bold mb-0">$9.00</p>
+                                            </div>
+                                          </div>
                                         </div>
-                                      </div>
-                                    </div>
-                                    <div class="col-md-4 col-sm-6">
-                                      <div class="card h-100">
-                                        <img src="https://via.placeholder.com/150" class="card-img-top" alt="Product">
-                                        <div class="card-body">
-                                          <h6 class="card-title">Chicken Sandwich</h6>
-                                          <p class="card-text mb-1">
-                                            <small class="text-muted">Qty: 1 x $8.75</small>
-                                          </p>
-                                          <p class="fw-bold mb-0">$8.75</p>
+                                        <div class="col-md-4 col-sm-6">
+                                          <div class="card h-100">
+                                            <img src="https://via.placeholder.com/150" class="card-img-top"
+                                              alt="Product">
+                                            <div class="card-body">
+                                              <h6 class="card-title">Chicken Sandwich</h6>
+                                              <p class="card-text mb-1">
+                                                <small class="text-muted">Qty: 1 x $8.75</small>
+                                              </p>
+                                              <p class="fw-bold mb-0">$8.75</p>
+                                            </div>
+                                          </div>
                                         </div>
-                                      </div>
-                                    </div>
-                                    <div class="col-md-4 col-sm-6">
-                                      <div class="card h-100">
-                                        <img src="https://via.placeholder.com/150" class="card-img-top" alt="Product">
-                                        <div class="card-body">
-                                          <h6 class="card-title">French Fries</h6>
-                                          <p class="card-text mb-1">
-                                            <small class="text-muted">Qty: 2 x $3.25</small>
-                                          </p>
-                                          <p class="fw-bold mb-0">$6.50</p>
+                                        <div class="col-md-4 col-sm-6">
+                                          <div class="card h-100">
+                                            <img src="https://via.placeholder.com/150" class="card-img-top"
+                                              alt="Product">
+                                            <div class="card-body">
+                                              <h6 class="card-title">French Fries</h6>
+                                              <p class="card-text mb-1">
+                                                <small class="text-muted">Qty: 2 x $3.25</small>
+                                              </p>
+                                              <p class="fw-bold mb-0">$6.50</p>
+                                            </div>
+                                          </div>
                                         </div>
                                       </div>
                                     </div>
                                   </div>
-                                </div>
-                              </div>
-                            </td>
-                          </tr>
-
-                          <!-- Another Order -->
-                          <tr class="order-row" data-bs-toggle="collapse" data-bs-target="#items-order-102">
-                            <td>102</td>
-                            <td>2024-04-10 12:45 PM</td>
-                            <td><span class="badge bg-success">Delivered</span></td>
-                            <td>$22.50</td>
-                            <td>
-                              <button class="btn btn-sm btn-outline-info">
-                                <i class="bi bi-list-ul"></i> Items
-                              </button>
-                            </td>
-                          </tr>
-                          <!-- Order items would go here -->
-                          <tr class="collapse-row">
-                            <td colspan="5" class="p-0">
-                              <div id="items-order-102" class="collapse">
-                                <div class="order-items p-3 bg-white">
-                                  <h6 class="mb-3">Order Items</h6>
-                                  <div class="row g-2">
-                                    <!-- Order items cards would go here -->
-                                  </div>
-                                </div>
-                              </div>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
+                                </td>
+                              </tr>
+                            </template>
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
-                  </div>
-                </td>
-              </tr>
-
+                  </td>
+                </tr>
+              </template>
             </tbody>
           </table>
         </div>
