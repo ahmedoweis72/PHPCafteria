@@ -27,7 +27,7 @@
             <!-- Button now directly triggers a navigation to the Cart component -->
             <router-link to="/cart" class="nav-link">
               <i class="fa fa-shopping-cart"></i>
-              <span class="badge badge-pill badge-primary">{{ cartCount }}</span> <!-- عرض عدد المنتجات في السلة -->
+              <span class="badge badge-pill badge-primary">{{ cartCount }}</span> 
             </router-link>
           </div>
         </div>
