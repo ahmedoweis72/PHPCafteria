@@ -26,9 +26,9 @@ function checkUserLogin() {
   const userData = AuthService.getCurrentUser();
   if (userData && userData.token) {
     isLoggedIn.value = true;
-    
+
     const userInfo = userData.decodedData?.data || {};
-    
+
     user.value = {
       name: userInfo.name,
       role: userInfo.role || "User",
@@ -57,13 +57,16 @@ function checkUserLogin() {
                 <li class="nav-item">
                   <router-link to="/all-product" class="nav-link">Products</router-link>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" v-if="user.role === 'Admin'">
                   <router-link to="/users" class="nav-link">Users</router-link>
+                </li>
+                <li class="nav-item" v-if="user.role === 'user'">
+                  <router-link to="/orders" class="nav-link">My Orders</router-link>
                 </li>
                 <li class="nav-item">
                   <router-link to="/order" class="nav-link">Manual Order</router-link>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" v-if="user.role === 'Admin'">
                   <router-link to="/checks" class="nav-link">Checks</router-link>
                 </li>
               </template>
@@ -76,7 +79,7 @@ function checkUserLogin() {
           <template v-if="!isLoggedIn">
             <button class="btn btn-primary" @click="login">Login</button>
           </template>
-          
+
           <!-- Show user info and logout button if logged in -->
           <template v-else>
             <button class="btn btn-outline-danger me-3" @click="logout">Logout</button>

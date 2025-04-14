@@ -8,19 +8,22 @@ import UpdateUserComponent from './views/UpdateUserComponent.vue';
 import EditProductComponent from './views/EditProductComponent.vue';
 import CheckComponent from './views/CheckComponent.vue';
 import OrderComponent from './views/OrderComponent.vue';
+import OrdersComponent from './views/OrdersComponent.vue';
 import LoginComponent from './views/Login.vue';
 import RegisterComponent from './views/Register.vue';
+import AuthService from './services/auth.service';
 
 const routes = [
-    // {
-    //     path:'/',
-    //     name:'Home page',
-    //     component:HeaderComponent
-    // },
+    {
+        path:'/',
+        name:'Home page',
+        component:AllProductComponent
+    },
     {
         path:'/login',
         name:'Login',
-        component:LoginComponent
+        component:LoginComponent,
+
     },
     {
         path:'/register',
@@ -30,22 +33,45 @@ const routes = [
     {
         path:'/updateUser/:id',
         name:'updateUser',
-        component:UpdateUserComponent
+        component:UpdateUserComponent,
+        meta: {
+            requiresAuth: true,
+            requiresAdmin: true
+        }
     },
     {
         path:'/users',
         name:'All users',
-        component:UsersComponent
+        component:UsersComponent,
+        meta: {
+            requiresAuth: true,
+            requiresAdmin: true
+        }
     },
     {
         path:'/order',
         name:'Make Order',
-        component:OrderComponent
+        component:OrderComponent,
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
+        path:'/orders',
+        name:'My Orders',
+        component:OrdersComponent,
+        meta: {
+            requiresAuth: true
+        }
     },
     {
         path: '/add-product',
         name: 'add',
-        component: AddProductComponent
+        component: AddProductComponent,
+        meta: {
+            requiresAuth: true,
+            requiresAdmin: true
+        }
     },
     {
         path: '/all-product',
@@ -55,17 +81,29 @@ const routes = [
     {
         path: '/add-category',
         name: 'cat',
-        component: AddCategoryComponent
+        component: AddCategoryComponent,
+        meta: {
+            requiresAuth: true,
+            requiresAdmin: true
+        }
     },
     {
         path: '/edit-product/:id',
         name: 'edit',
-        component: EditProductComponent
+        component: EditProductComponent,
+        meta: {
+            requiresAuth: true,
+            requiresAdmin: true
+        }
     },
     {
         path:'/checks',
         name:'checks',
-        component:CheckComponent
+        component:CheckComponent,
+        meta: {
+            requiresAuth: true,
+            requiresAdmin: true
+        }
     },
     {
         path: '/:pathMatch(.*)*',
@@ -77,6 +115,23 @@ const routes = [
 const router = createRouter({
     history: createWebHistory(),
     routes
+})
+
+router.beforeEach(async (to, from) => {
+    if (to.meta.requiresAuth && !AuthService.isLoggedIn()) {
+        return {
+            path: '/login',
+            query: { redirect: to.fullPath }
+        }
+    }
+
+    if (to.meta.requiresGuest && AuthService.isLoggedIn()) {
+        return { path: '/' }
+    }
+
+    if (to.meta.requiresAdmin && !AuthService.isAdmin()) {
+        return { path: '/' }
+    }
 })
 
 export default router

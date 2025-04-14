@@ -2,34 +2,22 @@
   <div class="login-container">
     <div class="form-card">
       <h2>Login</h2>
-      
+
       <div v-if="message" class="alert" :class="{ 'alert-error': error, 'alert-success': !error }">
         {{ message }}
       </div>
-      
+
       <form @submit.prevent="handleLogin">
         <div class="form-group">
           <label for="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            v-model="user.email"
-            required
-            placeholder="Enter your email"
-          />
+          <input type="email" id="email" v-model="user.email" required placeholder="Enter your email" />
         </div>
-        
+
         <div class="form-group">
           <label for="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            v-model="user.password"
-            required
-            placeholder="Enter your password"
-          />
+          <input type="password" id="password" v-model="user.password" required placeholder="Enter your password" />
         </div>
-        
+
         <button type="submit" :disabled="loading">
           <span v-if="loading">Loading...</span>
           <span v-else>Login</span>
@@ -60,14 +48,14 @@ export default {
       this.loading = true;
       this.message = '';
       this.error = false;
-      
+
       try {
         const data = await authService.login(this.user);
-        
+
         // Check if returning from a redirect
         const redirectPath = this.$route.query.redirect || '/';
         this.$router.push(redirectPath);
-        
+
         // Show success message briefly before redirect
         this.message = 'Login successful!';
         this.error = false;
@@ -94,7 +82,8 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-image: url('/src/assets/sincerely.jpg'); /* Update this path to your image */
+  background-image: url('/src/assets/sincerely.jpg');
+  /* Update this path to your image */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -136,7 +125,7 @@ input {
   font-size: 15px;
   transition: border-color 0.3s;
   color: white;
-  background-color: rgba(0, 0, 0, 0.7); 
+  background-color: rgba(0, 0, 0, 0.7);
 }
 
 input:focus {
