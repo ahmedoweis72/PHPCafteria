@@ -17,6 +17,8 @@ const updateUser = (userId) => {
     params: { id: userId }
   })
 };
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost/PHP_Cafeteria_Backend/public';
+
 
 const API_URL = 'http://localhost/PHP_Cafeteria_Backend/public';
 

@@ -34,11 +34,8 @@
                   <button @click="editCategory(category)" class="btn btn-sm btn-outline-primary">
                     <i class="bi bi-pencil-square me-2"></i>Edit
                   </button>
-                  <button
-                    @click="confirmDelete(category.id)"
-                    class="btn btn-sm btn-outline-danger"
-                    :disabled="categoryStore.isDeleting === category.id"
-                  >
+                  <button @click="confirmDelete(category.id)" class="btn btn-sm btn-outline-danger"
+                    :disabled="categoryStore.isDeleting === category.id">
                     <i class="bi bi-trash3 me-2"></i>
                     <span v-if="categoryStore.isDeleting === category.id">Deleting...</span>
                     <span v-else>Delete</span>
@@ -57,11 +54,7 @@
     </div>
 
     <!-- Modal for Deletion Confirmation -->
-    <div
-      class="modal fade"
-      :class="{ 'show d-block': showDeleteConfirmModal }"
-      tabindex="-1"
-    >
+    <div class="modal fade" :class="{ 'show d-block': showDeleteConfirmModal }" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
@@ -91,13 +84,8 @@
             <form @submit.prevent="submitForm">
               <div class="mb-3">
                 <label class="form-label">Category Name</label>
-                <input
-                  v-model="formData.name"
-                  type="text"
-                  class="form-control"
-                  required
-                  :class="{ 'is-invalid': errors.name }"
-                />
+                <input v-model="formData.name" type="text" class="form-control" required
+                  :class="{ 'is-invalid': errors.name }" />
                 <div class="invalid-feedback" v-if="errors.name">
                   {{ errors.name }}
                 </div>
@@ -233,17 +221,21 @@ onMounted(fetchCategories)
 .modal-backdrop {
   background-color: rgba(0, 0, 0, 0.5);
 }
+
 .modal {
   background-color: rgba(0, 0, 0, 0.4);
 }
+
 .modal-content {
   animation: fadeInDown 0.3s ease;
 }
+
 @keyframes fadeInDown {
   0% {
     opacity: 0;
     transform: translateY(-20px);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0);
