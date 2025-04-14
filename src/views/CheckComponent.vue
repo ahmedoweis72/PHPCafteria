@@ -14,23 +14,30 @@ const selectedUser = ref('');
 const users = ref([]);
 const expandedOrder = ref('');
 const expandedUser = ref('');
+const selectedUserName = ref('');
+const loadingOrders = ref(false);
+const selectedUserOrders = ref('');
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost/PHP_Cafeteria_Backend/public';
+
+const token = localStorage.getItem('token');
 
 const fetchUsers = async (page = 1) => {
   try {
     loading.value = true;
-    const response = await axios.get(`${API_URL}/admin/users`, {
+    const response = await axios.get(`${API_URL}/users-with-orders`, {
       params: {
         page,
-        start_date: startDate.value,
-        end_date: endDate.value
+      }, headers: {
+        'Authorization': `Bearer ${token}`
       }
     });
 
     users.value = response.data.data;
-    totalPages.value = response.data.pagination.last_page;
+    console.log(response.data.data);
+    totalPages.value = response.data.pagination.total_pages;
     currentPage.value = page;
+
 
   } catch (err) {
     console.error('Failed to fetch user data', err);
@@ -38,11 +45,99 @@ const fetchUsers = async (page = 1) => {
     loading.value = false;
   }
 
-  //const fetchUserOrders = async
+}
+
+const fetchUserOrders = async (userId) => {
+  try {
+    const response = await axios.get(`${API_URL}/users/${userId}/orders`, {
+      params: {
+        startDate: startDate.value,
+        endDate: endDate.value
+      }, headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    return response.data;
+
+  } catch (err) {
+    console.error('Failed to fetch orders of user', err);
+    return null;
+  } finally {
+    loading.value = false;
+  }
+}
+
+//To show the orders for the user when he click on the button
+const toggleUserOrders = async (user) => {
+  //To make the button toggle
+  if (expandedUser.value === user.id) {
+    expandedUser.value = null;
+    return;
+  }
+  console.log(user);
+  expandedUser.value = user.id;
+  selectedUserName.value = user.fullName;
+  loadingOrders.value = true;
+
+
+  try {
+    //Fetch all orders for this user
+    const response = await fetchUserOrders(user.user_id);
+    console.log(response);
+
+    if (response && response.data) {
+      selectedUserOrders.value = response.data;
+
+    } else {
+      selectedUserOrders.value = [];
+
+    }
+
+  } catch (err) {
+    console.error(`Error fetching orders:`, err);
+    selectedUserOrders.value = [];
+  } finally {
+    loadingOrders.value = false;
+  }
 
 }
 
+//To toggle orderItems
+const toggleOrderItems = (orderId) => {
+  expandedOrder.value = expandedOrder.value === orderId ? null : orderId;
+}
 
+//Format date if I need
+const formatDate = (dateString) => {
+
+}
+
+//When user click the apply every thing will be reset 
+const applyFilters = () => {
+  // Reset expanded state
+  expandedUser.value = null;
+  expandedOrder.value = null;
+  selectedUserOrders.value = [];
+
+  // Reset to page 1
+  currentPage.value = 1;
+
+  // Fetch users with filters
+  fetchUsers(1);
+};
+
+
+onMounted(() => {
+  fetchUsers();
+})
+
+const changePage = (page) => {
+  if (page > 0 && page <= totalPages.value) {
+    currentPage.value = page;
+    fetchUsers(page);
+  }
+}
 
 
 
@@ -60,21 +155,19 @@ const fetchUsers = async (page = 1) => {
           <!-- Date Range Filters -->
           <div class="col-md-3">
             <label for="startDate" class="form-label">Start Date</label>
-            <input type="date" class="form-control" id="startDate">
+            <input v-model="startDate" type="date" class="form-control" id="startDate">
           </div>
           <div class="col-md-3">
             <label for="endDate" class="form-label">End Date</label>
-            <input type="date" class="form-control" id="endDate">
+            <input v-model="endDate" type="date" class="form-control" id="endDate">
           </div>
 
           <!-- User Filter -->
           <div class="col-md-4">
             <label for="userFilter" class="form-label">Filter by User</label>
-            <select class="form-select" id="userFilter">
+            <select v-model="selectedUser" class="form-select" id="userFilter">
               <option value="">All Users</option>
-              <option value="1">John Doe</option>
-              <option value="2">Jane Smith</option>
-              <!-- More users would be dynamically added here -->
+              <option v-for="user in users" :key="user.id" :value="user.id">{{ user.fullName }}</option>
             </select>
           </div>
 
@@ -105,19 +198,23 @@ const fetchUsers = async (page = 1) => {
             </thead>
             <tbody>
               <!-- User Row - Clicking expands to show their orders -->
-              <tr class="user-row" data-bs-toggle="collapse" data-bs-target="#orders-user-1">
-                <td>1</td>
+              <tr v-for="(user, index) in users" :key="user.id" class="user-row" data-bs-toggle="collapse"
+                data-bs-target="#orders-user-1">
+                <td>{{ index + 1 + (currentPage - 1) * 6 }}</td>
                 <td>
-                  <img src="https://via.placeholder.com/40" alt="John Doe" class="rounded-circle" width="40"
-                    height="40">
+                  <img
+                    :src="user.profilePicture || 'https://image.shutterstock.com/image-vector/vector-flat-illustration-grayscale-avatar-260nw-2281862025.jpg'"
+                    :alt="user.fullName" class=" rounded-circle" width="40" height="40">
                 </td>
-                <td>John Doe</td>
-                <td>Room 101</td>
-                <td>5</td>
-                <td>$125.50</td>
+                <td>{{ user.fullName }}</td>
+                <td>Room {{ user.roomNum }}</td>
+                <td>{{ user.order_count || 0 }}</td>
+                <td>${{ (parseFloat(user.total_spent) || 0).toFixed(2) }}</td>
                 <td>
-                  <button class="btn btn-sm btn-outline-primary">
-                    <i class="bi bi-chevron-down"></i> Details
+                  <button @click="toggleUserOrders(user)" class="btn btn-sm btn-outline-primary"
+                    :class="{ 'active': expandedUser === user.id }">
+                    <i :class="expandedUser === user.id ? 'bi bi-chevron-up' : 'bi bi-chevron-down'"></i> {{
+                      expandedUser === user.id ? 'Hide' : 'Details' }}
                   </button>
                 </td>
               </tr>
@@ -236,31 +333,6 @@ const fetchUsers = async (page = 1) => {
                 </td>
               </tr>
 
-              <!-- Another User -->
-              <tr class="user-row" data-bs-toggle="collapse" data-bs-target="#orders-user-2">
-                <td>2</td>
-                <td>
-                  <img src="https://via.placeholder.com/40" alt="Jane Smith" class="rounded-circle" width="40"
-                    height="40">
-                </td>
-                <td>Jane Smith</td>
-                <td>Room 202</td>
-                <td>3</td>
-                <td>$87.25</td>
-                <td>
-                  <button class="btn btn-sm btn-outline-primary">
-                    <i class="bi bi-chevron-down"></i> Details
-                  </button>
-                </td>
-              </tr>
-              <!-- Jane's orders would go here -->
-              <tr class="collapse-row">
-                <td colspan="7" class="p-0">
-                  <div id="orders-user-2" class="collapse">
-                    <!-- Orders table for Jane would go here -->
-                  </div>
-                </td>
-              </tr>
             </tbody>
           </table>
         </div>
@@ -296,25 +368,6 @@ const fetchUsers = async (page = 1) => {
       </ul>
     </nav>
 
-    <!-- Summary Card -->
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <div class="row">
-          <div class="col-md-4">
-            <h6 class="text-muted">Total Users</h6>
-            <h3>2</h3>
-          </div>
-          <div class="col-md-4">
-            <h6 class="text-muted">Total Orders</h6>
-            <h3>8</h3>
-          </div>
-          <div class="col-md-4">
-            <h6 class="text-muted">Total Revenue</h6>
-            <h3>$212.75</h3>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
