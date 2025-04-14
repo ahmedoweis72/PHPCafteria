@@ -19,13 +19,20 @@ const updateUser = (userId) => {
 };
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost/PHP_Cafeteria_Backend/public';
 
+
+const API_URL = 'http://localhost/PHP_Cafeteria_Backend/public';
+
+const token = localStorage.getItem('token');
+
 const fetchUsers = async (page = 1) => {
   try {
     loading.value = true;
     const response = await axios.get(`${API_URL}/users`, {
-      params: { page }
+      params: { page },
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
     });
-    //I have to pass token to header to handle admin authorization
     users.value = response.data.data;
     totalPages.value = response.data.pagination.last_page;
     currentPage.value = page;
