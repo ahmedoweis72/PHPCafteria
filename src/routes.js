@@ -12,12 +12,25 @@ import HomeComponent from './views/HomeView.vue';
 import CheckComponent from './views/CheckComponent.vue';
 import UserOrder from './views/UserOrder.vue';
 import CartView from './views/CartView.vue';
+import OrderComponent from './views/OrderComponent.vue';
+import LoginComponent from './views/Login.vue';
+import RegisterComponent from './views/Register.vue';
+
 const routes = [
     {
-        path:'/',
+         path:'/',
         name:'Home-page',
         component:HomeComponent
-
+     },
+    {
+        path:'/login',
+        name:'Login',
+        component:LoginComponent
+    },
+    {
+        path:'/register',
+        name:'Register',
+        component:RegisterComponent
     },
     {
         path:'/updateUser/:id',
@@ -30,11 +43,15 @@ const routes = [
         component:UsersComponent
     },
     {
+        path:'/order',
+        name:'Make Order',
+        component:OrderComponent
+    },
+    {
         path: '/add-product',
         name: 'add',
         component: AddProductComponent
     },
-    ,
     {
         path: '/all-product',
         name: 'all',

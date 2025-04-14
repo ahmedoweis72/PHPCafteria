@@ -1,6 +1,6 @@
 <script setup>
-import {ref,onMounted} from 'vue';
-import axios from 'axios'; 
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
 import { useRouter } from 'vue-router';
 
 const users = ref([]);
@@ -11,38 +11,42 @@ const showEditForm = ref(false);
 
 const router = useRouter();
 
-const updateUser = (userId)=>{
+const updateUser = (userId) => {
   router.push({
-     name:'updateUser',
-     params:{id:userId}
+    name: 'updateUser',
+    params: { id: userId }
   })
 };
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost/PHP_Cafeteria_Backend/public';
 
-const API_URL = 'http://localhost/PHP_Cafeteria_Backend/public';
 
-const fetchUsers = async (page = 1)=>{
-  try{
+const token = localStorage.getItem('token');
+
+const fetchUsers = async (page = 1) => {
+  try {
     loading.value = true;
-    const response = await axios.get(`${API_URL}/users`,{
-      params:{page}
+    const response = await axios.get(`${API_URL}/users`, {
+      params: { page },
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
     });
-    //I have to pass token to header to handle admin authorization
     users.value = response.data.data;
-    totalPages.value =response.data.pagination.last_page;
-    currentPage.value= page;
+    totalPages.value = response.data.pagination.last_page;
+    currentPage.value = page;
     // console.log(users.value);
     // console.log(response.data.pagination);
 
-  }catch(err){
-    console.error('Failed to fetch user data',err);
-  }finally{
-    loading.value= false;
+  } catch (err) {
+    console.error('Failed to fetch user data', err);
+  } finally {
+    loading.value = false;
   }
 }
 
 //Handle the pagination 
-const changePage = (page)=>{
-  if(page > 0 && page <=totalPages.value){
+const changePage = (page) => {
+  if (page > 0 && page <= totalPages.value) {
     currentPage.value = page;
     fetchUsers(page);
   }
@@ -50,20 +54,20 @@ const changePage = (page)=>{
 
 
 //Implement the delete method here
-const deleteUser = async (UserId)=>{
-  if(confirm("Do you really want to delete user?")){
-    try{
+const deleteUser = async (UserId) => {
+  if (confirm("Do you really want to delete user?")) {
+    try {
       await axios.delete(`${API_URL}/users/${UserId}`);
       fetchUsers(currentPage.value);
-    }catch(err){
-      console.err('Failed to delete user:',err);
+    } catch (err) {
+      console.err('Failed to delete user:', err);
       alert('Failed to delete user,please try again!');
     }
   }
 
 }
 
-onMounted(()=>{
+onMounted(() => {
   fetchUsers(1);
 })
 
@@ -80,13 +84,13 @@ onMounted(()=>{
     </div>
 
     <div v-if="loading" class="text-center my-4">
-    <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Loading...</span>
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
     </div>
-  </div>
 
-      <!-- Users table -->
-      <div v-else class="table-responsive">
+    <!-- Users table -->
+    <div v-else class="table-responsive">
       <table class="table table-hover">
         <thead class="table-light">
           <tr>
@@ -103,21 +107,13 @@ onMounted(()=>{
           <tr v-for="(user, index) in users" :key="user.id">
             <th scope="row">{{ (currentPage - 1) * 6 + index + 1 }}</th>
             <td>
-              <img 
-                :src="user.image" 
-                :alt="user.name" 
-                class="rounded-circle" 
-                width="40" 
-                height="40"
-              >
+              <img :src="user.image" :alt="user.name" class="rounded-circle" width="40" height="40">
             </td>
             <td>{{ user.fullName }}</td>
             <td>{{ user.email }}</td>
             <td>{{ user.roomNum }}</td>
             <td>
-              <span 
-                :class="user.role === 'admin' ? 'badge bg-primary' : 'badge bg-secondary'"
-              >
+              <span :class="user.role === 'admin' ? 'badge bg-primary' : 'badge bg-secondary'">
                 {{ user.role }}
               </span>
             </td>
@@ -141,24 +137,22 @@ onMounted(()=>{
 
     <nav aria-label="Users pagination" class="mt-4">
       <ul class="pagination justify-content-center">
-        <li class="page-item" :class="{disabled: currentPage===1}">
-          <a class="page-link" href="#" @click.prevent="changePage(currentPage-1)">Previous</a>
+        <li class="page-item" :class="{ disabled: currentPage === 1 }">
+          <a class="page-link" href="#" @click.prevent="changePage(currentPage - 1)">Previous</a>
         </li>
-        <li v-for="page in totalPages" :key="page" class="page-item" :class="{active: page===currentPage}">
-          <a class="page-link" @click.prevent="changePage(page)"  href="#">{{ page }}</a>
+        <li v-for="page in totalPages" :key="page" class="page-item" :class="{ active: page === currentPage }">
+          <a class="page-link" @click.prevent="changePage(page)" href="#">{{ page }}</a>
         </li>
-        <li class="page-item" :class="{disabled: currentPage >= totalPages}">
-          <a class="page-link" @click.prevent="changePage(currentPage+1)" href="#">Next</a>
+        <li class="page-item" :class="{ disabled: currentPage >= totalPages }">
+          <a class="page-link" @click.prevent="changePage(currentPage + 1)" href="#">Next</a>
         </li>
       </ul>
     </nav>
 
   </div>
-  
+
 </template>
 
 
 
-<style scoped>
-
-</style>
+<style scoped></style>

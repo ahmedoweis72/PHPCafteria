@@ -12,7 +12,7 @@ const confirmPassword = ref('');
 const error = ref(null);
 const loading = ref(false);
 
-const API_URL = 'http://localhost/PHP_Cafeteria_Backend/public';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost/PHP_Cafeteria_Backend/public';
 
 const fetchUser = async (userId) => {
   try {

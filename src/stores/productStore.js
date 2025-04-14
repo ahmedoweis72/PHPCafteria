@@ -2,6 +2,9 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost/PHP_Cafeteria_Backend/public';
+
+
 export const useProductStore = defineStore('product', {
   state: () => ({
     categories: [],
@@ -10,8 +13,6 @@ export const useProductStore = defineStore('product', {
   }),
 
   actions: {
-   
-
     async createProduct(product) {
       this.isLoading = true
       this.error = null
@@ -27,10 +28,9 @@ export const useProductStore = defineStore('product', {
         if (product.imageFile) {
           formData.append('image', product.imageFile)
         }
-        console.log(formData);
         
         const response = await axios.post(
-          'http://localhost/PHP_Cafeteria_Backend/public/products',
+          `${API_URL}/products`,
           formData,
           {
             headers: {
@@ -48,12 +48,11 @@ export const useProductStore = defineStore('product', {
       }
     },
 
-    
     async updateProduct(id, formData) {
       try {
         this.isLoading = true
         const response = await axios.post(
-          `http://localhost/PHP_Cafeteria_Backend/public/products/${id}`,
+          `${API_URL}/products/${id}`,
           formData,
           {
             headers: {
@@ -69,15 +68,13 @@ export const useProductStore = defineStore('product', {
         this.isLoading = false
       }
     },
-    
 
     async fetchProduct(id) {
       this.isLoading = true
       this.error = null
       try {
         const response = await axios.get(
-          
-          `http://localhost/PHP_Cafeteria_Backend/public/products/${id}`
+          `${API_URL}/products/${id}`
         )
         this.currentProduct = response.data
         return response.data
@@ -87,7 +84,7 @@ export const useProductStore = defineStore('product', {
       } finally {
         this.isLoading = false
       }
-    },
+    }
   }
 })
 
