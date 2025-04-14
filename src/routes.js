@@ -8,15 +8,25 @@ import UpdateUserComponent from './views/UpdateUserComponent.vue';
 import EditProductComponent from './views/EditProductComponent.vue';
 import CheckComponent from './views/CheckComponent.vue';
 import OrderComponent from './views/OrderComponent.vue';
-
+import LoginComponent from './views/Login.vue';
+import RegisterComponent from './views/Register.vue';
 
 const routes = [
     // {
     //     path:'/',
     //     name:'Home page',
     //     component:HeaderComponent
-
     // },
+    {
+        path:'/login',
+        name:'Login',
+        component:LoginComponent
+    },
+    {
+        path:'/register',
+        name:'Register',
+        component:RegisterComponent
+    },
     {
         path:'/updateUser/:id',
         name:'updateUser',
@@ -37,7 +47,6 @@ const routes = [
         name: 'add',
         component: AddProductComponent
     },
-    ,
     {
         path: '/all-product',
         name: 'all',
