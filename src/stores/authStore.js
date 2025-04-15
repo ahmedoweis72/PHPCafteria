@@ -8,7 +8,12 @@ export const useAuthStore = defineStore('auth', {
     
     getters: {
         isAuthenticated: (state) => !!state.token,
-        isAdmin: (state) => state.user?.role === 'admin'
+        isAdmin: (state) => {
+            if (!state.token) return false;
+            const payload = JSON.parse(atob(state.token.split('.')[1]));
+            console.log(payload);
+            return payload.role === 'admin';
+          }
     },
     
     actions: {
@@ -29,5 +34,8 @@ export const useAuthStore = defineStore('auth', {
         }
     },
     
-    persist: true
+    persist: {
+        key: 'user',
+        paths: ['user', 'token']
+    }
 })
