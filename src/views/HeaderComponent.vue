@@ -39,8 +39,9 @@ function checkUserLogin() {
 
 onMounted(() => {
   checkUserLogin();
-  const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-  cartCount.value = cartItems.length;
+  const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+  cartCount.value = cartItems.reduce((total, item) => total + item.quantity, 0);
+
 });
 </script>
 

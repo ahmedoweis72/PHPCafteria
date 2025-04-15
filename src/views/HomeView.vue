@@ -86,9 +86,15 @@ export default {
   },
   methods: {
     addToCart(product) {
+      const existingItem = this.cart.find(item => item.id === product.id);
+      if (existingItem) {
+   
+    existingItem.quantity = (existingItem.quantity || 1) + 1;
+  } else {
+    
+    this.cart.push({ ...product, quantity: 1 });
+  }
       
-      this.cart.push(product);
-     
       localStorage.setItem('cart', JSON.stringify(this.cart));
       console.log('Added to cart:', product);
     },
