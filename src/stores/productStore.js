@@ -1,6 +1,7 @@
 // src/stores/productStore.js
 import { defineStore } from 'pinia'
 import axios from 'axios'
+import authService from '../services/auth.service';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost/PHP_Cafeteria_Backend/public';
 
@@ -28,13 +29,15 @@ export const useProductStore = defineStore('product', {
         if (product.imageFile) {
           formData.append('image', product.imageFile)
         }
+
         
         const response = await axios.post(
           `${API_URL}/products`,
           formData,
           {
             headers: {
-              'Content-Type': 'multipart/form-data'
+              ...authService.authHeader(),
+              'Content-Type': 'multipart/form-data',
             }
           }
         )
@@ -51,12 +54,14 @@ export const useProductStore = defineStore('product', {
     async updateProduct(id, formData) {
       try {
         this.isLoading = true
+        this.error = null
         const response = await axios.post(
           `${API_URL}/products/${id}`,
           formData,
           {
             headers: {
-              'Content-Type': 'multipart/form-data'
+              ...authService.authHeader(),
+              'Content-Type': 'multipart/form-data',
             }
           }
         )
