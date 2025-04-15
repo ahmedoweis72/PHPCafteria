@@ -11,7 +11,7 @@ import OrderComponent from './views/OrderComponent.vue';
 import OrdersComponent from './views/OrdersComponent.vue';
 import LoginComponent from './views/Login.vue';
 import RegisterComponent from './views/Register.vue';
-import authService from './services/auth.service';
+import AuthService from './services/auth.service';
 
 const routes = [
     {
