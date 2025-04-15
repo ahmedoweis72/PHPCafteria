@@ -12,6 +12,7 @@ const password = ref('');
 const confirmPassword = ref('');
 const error = ref(null);
 const loading = ref(false);
+const newImageFile = ref(null);
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost/PHP_Cafeteria_Backend/public';
 
@@ -39,22 +40,33 @@ const updateUserData = async () => {
     return;
   }
 
-  const updatedUser = {
-    fullName: user.value.fullName,
-    email: user.value.email,
-    roomNum: user.value.roomNum,
-    role: user.value.role
-  }
+  let formData = new FormData();
+  formData.append('fullName', user.value.fullName);
+  formData.append('email', user.value.email);
+  formData.append('roomNum', user.value.roomNum);
+  formData.append('role', user.value.role);
+
 
   if (password.value) {
-    updatedUser.password = password.value;
+    formData.append('password', password.value);
+  }
+
+  if (newImageFile.value) {
+    formData.append('profilePic', newImageFile.value);
+  }
+
+  for (let pair of formData.entries()) {
+    console.log(pair[0] + ', ' + pair[1]);
   }
 
   try {
     loading.value = true;
-    await axios.patch(`${API_URL}/users/${userId}`, updatedUser, {
-      headers: { 'Authorization': `Bearer ${token}` }
+    await axios.post(`${API_URL}/users/${userId}`, formData, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      }
     });
+
 
     router.push('/users');
 
@@ -63,6 +75,15 @@ const updateUserData = async () => {
     error.value = 'Failed to update user';
   } finally {
     loading.value = false;
+  }
+}
+
+//Function to get the file when user upload it and show it to the user
+const onImageChange = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    newImageFile.value = file;
+    user.value.profilePic = URL.createObjectURL(file);
   }
 }
 
@@ -105,13 +126,13 @@ onMounted(() => {
         <div class="row mb-4 justify-content-center">
           <div class="col-md-4 text-center">
             <div class="position-relative d-inline-block">
-              <img :src="user.image" alt="User profile" class="rounded-circle img-thumbnail mb-2"
+              <img :src="user.profilePic" alt="User profile" class="rounded-circle img-thumbnail mb-2"
                 style="width: 150px; height: 150px; object-fit: cover;" />
               <div class="position-absolute bottom-0 end-0">
                 <label for="imageUpload" class="btn btn-sm btn-primary rounded-circle">
                   <i class="bi bi-camera"></i>
                 </label>
-                <input type="file" id="imageUpload" class="d-none" />
+                <input type="file" id="imageUpload" class="d-none" @change="onImageChange" />
               </div>
             </div>
             <small class="text-muted d-block">Click the camera icon to change profile picture</small>

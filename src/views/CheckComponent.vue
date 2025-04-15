@@ -9,7 +9,7 @@ const loading = ref(false);
 
 const startDate = ref('');
 const endDate = ref('');
-const selectedUser = ref('');
+const selectedUser = ref(null);
 
 
 const users = ref([]);
@@ -42,7 +42,6 @@ const fetchUsers = async (page = 1) => {
     });
 
     users.value = response.data.data;
-    console.log(response.data.data);
     totalPages.value = response.data.pagination.total_pages;
     currentPage.value = page;
 
