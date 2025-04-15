@@ -14,18 +14,12 @@ const orderItems = ref({})
 const fetchProcessingOrders = async () => {
     loading.value = true
     try {
-        const response = await axios.get(`${API_URL}/users-with-orders`, {
+        const response = await axios.get(`${API_URL}/users-orders`, {
             headers: authService.authHeader(),
-            params: {
-                status: 'processing'
-            }
         })
 
-        if (response.data.status === 'success') {
-            orders.value = response.data.data || []
-        } else {
-            toast.error(response.data.message || 'Failed to fetch orders')
-        }
+        orders.value = response.data.data || []
+
     } catch (error) {
         console.error('Error fetching orders:', error)
         toast.error('Failed to fetch orders queue')
@@ -120,7 +114,8 @@ onMounted(() => {
                                 <tr>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <button class="btn btn-sm btn-icon me-2" @click="toggleOrderItems(order.id)"
+                                            <button class="btn btn-sm btn-icon me-2"
+                                                @click="toggleOrderItems(order.order_id)"
                                                 :title="expandedOrders.has(order.id) ? 'Hide Details' : 'Show Details'">
                                                 <i class="bi"
                                                     :class="expandedOrders.has(order.id) ? 'bi-dash-circle-fill' : 'bi-plus-circle-fill'"
@@ -131,20 +126,20 @@ onMounted(() => {
                                         </div>
                                     </td>
                                     <td>{{ order.fullName }}</td>
-                                    <td>{{ order.room_number }}</td>
-                                    <td>{{ order.ext }}</td>
+                                    <td>{{ order.roomNum }}</td>
+                                    <td>{{ order.Ext }}</td>
                                     <td class="text-center">
-                                        <button class="btn btn-sm btn-success" @click="markAsDelivered(order.id)">
+                                        <button class="btn btn-sm btn-success" @click="markAsDelivered(order.order_id)">
                                             <i class="bi bi-check2"></i> Deliver
                                         </button>
                                     </td>
                                 </tr>
                                 <!-- Order Items Expansion Row -->
-                                <tr v-if="expandedOrders.has(order.id)">
+                                <tr v-if="expandedOrders.has(order.order_id)">
                                     <td colspan="5">
                                         <div class="order-items-container p-3">
                                             <div class="row g-3">
-                                                <div v-for="item in orderItems[order.id]" :key="item.id"
+                                                <div v-for="item in orderItems[order.order_id]" :key="item.id"
                                                     class="col-md-6">
                                                     <div class="card h-100">
                                                         <div class="row g-0">
@@ -157,7 +152,7 @@ onMounted(() => {
                                                                     <h5 class="card-title">{{ item.name }}</h5>
                                                                     <p class="card-text">
                                                                         Quantity: {{ item.quantity }}<br>
-                                                                        Price: {{ item.price_at_order }} EGP
+                                                                        Price: {{ item.price }} EGP
                                                                     </p>
                                                                 </div>
                                                             </div>
