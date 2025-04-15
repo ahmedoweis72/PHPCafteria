@@ -21,10 +21,6 @@ const updateUser = (userId) => {
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost/PHP_Cafeteria_Backend/public';
 
 
-<<<<<<< HEAD:src/views/UsersComponent.vue
-=======
-
->>>>>>> c7b43759692653b8803fc90588005d2396046185:src/views/users/UsersComponent.vue
 const fetchUsers = async (page = 1) => {
   try {
     loading.value = true;
@@ -35,6 +31,14 @@ const fetchUsers = async (page = 1) => {
     users.value = response.data.data;
     totalPages.value = response.data.pagination.last_page;
     currentPage.value = page;
+
+    const currentUser = authService.getCurrentUser();
+    const currentUserImage = currentUser?.decodedData?.data?.image || '';
+
+    users.value = response.data.data.map(user => ({
+      ...user,
+      profilePic: user.profilePic || (user.user_id === currentUser?.decodedData?.data?.id ? currentUserImage : '')
+    }));
 
   } catch (err) {
     console.error('Failed to fetch user data', err);
