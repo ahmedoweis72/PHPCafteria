@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted , computed } from 'vue';
 import { useRouter } from 'vue-router';
 import AuthService from '../services/auth.service'; 
 import cartState from '../stores/cartStore';
@@ -7,7 +7,8 @@ import cartState from '../stores/cartStore';
 const router = useRouter();
 const isLoggedIn = ref(false);
 const user = ref(null);
-const cartCount = ref(0);
+const cartCount = computed(() => cartState.count);
+//const cartCount = ref(0);
 
 function logout() {
   AuthService.logout();
@@ -41,7 +42,8 @@ function checkUserLogin() {
 onMounted(() => {
   checkUserLogin();
   const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
-  cartCount.value = cartItems.reduce((total, item) => total + item.quantity, 0);
+  cartState.refreshFromLocalStorage();
+  //cartCount.value = cartItems.reduce((total, item) => total + item.quantity, 0);
 });
 </script>
 
@@ -81,7 +83,7 @@ onMounted(() => {
           <div class="cart-icon position-relative me-3">
             <router-link to="/cart" class="nav-link position-relative">
               <i class="fa fa-shopping-cart fa-lg"></i>
-              <span v-if="cartState.count > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+              <span v-if="cartCount > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                 {{ cartCount }}
                 <span class="visually-hidden">items in cart</span>
               </span>

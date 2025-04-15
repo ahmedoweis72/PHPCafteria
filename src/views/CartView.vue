@@ -66,7 +66,8 @@ export default {
   },
   data() {
     return {
-      cart: JSON.parse(localStorage.getItem('cart')) || [],
+      cart: cartState.items,
+      //cart: JSON.parse(localStorage.getItem('cart')) || [],
       rooms: [],
       selectedRoom: null
     };
@@ -84,8 +85,9 @@ export default {
   },
   methods: {
     increaseQuantity(item) {
-      item.quantity = (item.quantity || 1) + 1;
-      this.updateLocalStorage();
+      cartState.increaseQuantity(item.id);
+      //item.quantity = (item.quantity || 1) + 1;
+     // this.updateLocalStorage();
     },
     decreaseQuantity(item) {
       if (item.quantity > 1) {
@@ -105,7 +107,8 @@ export default {
       this.updateLocalStorage();
     },
     updateLocalStorage() {
-      localStorage.setItem('cart', JSON.stringify(this.cart));
+      cartState.items = this.cart;
+      cartState.save();
     },
     confirmOrder() {
       const orderData = {

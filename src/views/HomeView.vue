@@ -103,13 +103,15 @@
 import axios from 'axios';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
+import cartState from '../stores/cartStore'; 
 
 export default {
   data() {
     return {
       products: [],
       selectedCategory: '',
-      cart: JSON.parse(localStorage.getItem('cart')) || [],
+      cart: cartState.items,
+      //cart: JSON.parse(localStorage.getItem('cart')) || [],
     };
   },
   computed: {
@@ -145,34 +147,25 @@ export default {
   },
   methods: {
     addToCart(product) {
-      const existingItem = this.cart.find((item) => item.product_id === product.id);
-      if (existingItem) {
-        existingItem.quantity += 1;
-      } else {
-        const cartItem = {
-          product_id: product.id,
-          name: product.name,
-          price: parseFloat(product.price),
-          image: product.image,
-          quantity: 1,
-          notes: '',
-        };
-        this.cart.push(cartItem);
-      }
-      localStorage.setItem('cart', JSON.stringify(this.cart));
+      cartState.addItem({
+      id: product.id,
+      name: product.name,
+      price: parseFloat(product.price),
+      image: product.image,
+      quantity: 1
+    });
+    this.cart = cartState.items; 
       toast.success('Add to Cart Successfully!');
       console.log('Added to cart:', product);
     },
     removeFromCart(item) {
-      const index = this.cart.indexOf(item);
-      if (index !== -1) {
-        this.cart.splice(index, 1);
-        localStorage.setItem('cart', JSON.stringify(this.cart));
-      }
+      cartState.removeItem(item.id); 
+    // this.cart = cartState.items;
     },
     clearCart() {
-      this.cart = [];
-      localStorage.setItem('cart', JSON.stringify(this.cart));
+      cartState.clearCart();
+      //this.cart = [];
+     // localStorage.setItem('cart', JSON.stringify(this.cart));
     },
   },
 };

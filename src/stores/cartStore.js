@@ -5,7 +5,7 @@ const cartState = reactive({
 
   
   get count() {
-    return this.items.reduce((total, item) => total + item.quantity, 0);
+    return this.items.reduce((total, item) => total + (item.quantity || 1), 0);
   },
 
   get totalPrice() {
