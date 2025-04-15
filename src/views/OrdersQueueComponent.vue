@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
-import AuthService from '../services/auth.service'
+import authService from '../services/auth.service'
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
 
@@ -15,7 +15,7 @@ const fetchProcessingOrders = async () => {
     loading.value = true
     try {
         const response = await axios.get(`${API_URL}/users-with-orders`, {
-            headers: AuthService.authHeader(),
+            headers: authService.authHeader(),
             params: {
                 status: 'processing'
             }
@@ -40,7 +40,7 @@ const toggleOrderItems = async (orderId) => {
     } else {
         try {
             const response = await axios.get(`${API_URL}/orders/${orderId}/info`, {
-                headers: AuthService.authHeader()
+                headers: authService.authHeader()
             })
             if (response.data.status === 'success') {
                 orderItems.value[orderId] = response.data.data
@@ -56,7 +56,7 @@ const markAsDelivered = async (orderId) => {
     try {
         const response = await axios.patch(`${API_URL}/orders/${orderId}/status`,
             { status: 'completed' },
-            { headers: AuthService.authHeader() }
+            { headers: authService.authHeader() }
         )
 
         if (response.data.status === 'success') {

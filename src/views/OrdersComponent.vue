@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
-import AuthService from '../services/auth.service'
+import authService from '../services/auth.service'
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
 
@@ -18,7 +18,7 @@ const dateRange = ref({
 })
 
 // Get current user ID from auth service
-const currentUser = AuthService.getCurrentUser()
+const currentUser = authService.getCurrentUser()
 const userId = currentUser?.decodedData?.data?.id
 
 const fetchOrders = async () => {
@@ -38,7 +38,7 @@ const fetchOrders = async () => {
         }
 
         const response = await axios.get(`${API_URL}/users/${userId}/orders?${params}`, {
-            headers: AuthService.authHeader()
+            headers: authService.authHeader()
         })
 
         if (response.data.status === 'success') {
@@ -94,7 +94,7 @@ const toggleOrderItems = async (orderId) => {
     } else {
         try {
             const response = await axios.get(`${API_URL}/orders/${orderId}/info`, {
-                headers: AuthService.authHeader()
+                headers: authService.authHeader()
             })
             if (response.data.status === 'success') {
                 if (!response.data.data || response.data.data.length === 0) {
@@ -113,7 +113,7 @@ const toggleOrderItems = async (orderId) => {
 const cancelOrder = async (orderId) => {
     try {
         const response = await axios.post(`${API_URL}/orders/${orderId}/cancel`, {}, {
-            headers: AuthService.authHeader()
+            headers: authService.authHeader()
         })
         if (response.data.status === 'success') {
             toast.success('Order cancelled successfully')
