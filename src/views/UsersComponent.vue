@@ -35,6 +35,7 @@ const fetchUsers = async (page = 1) => {
     users.value = response.data.data;
     totalPages.value = response.data.pagination.last_page;
     currentPage.value = page;
+    console.log(response);
     // console.log(users.value);
     // console.log(response.data.pagination);
 
@@ -112,7 +113,7 @@ onMounted(() => {
           <tr v-for="(user, index) in users" :key="user.id">
             <th scope="row">{{ (currentPage - 1) * 6 + index + 1 }}</th>
             <td>
-              <img :src="user.image" :alt="user.name" class="rounded-circle" width="40" height="40">
+              <img :src="user.profilePic" :alt="user.name" class="rounded-circle" width="40" height="40">
             </td>
             <td>{{ user.fullName }}</td>
             <td>{{ user.email }}</td>
