@@ -95,7 +95,7 @@ onMounted(() => {
             </ul>
           </nav>
 
-          <div class="cart-icon">
+          <div class="cart-icon" v-if="user?.role === 'user'">
             <router-link to="/cart" class="nav-link">
               <i class="fa fa-shopping-cart"></i>
               <span class="badge badge-pill badge-primary">{{ cartCount }}</span>
@@ -110,7 +110,7 @@ onMounted(() => {
           </template>
 
           <!-- Show user info and logout button if logged in -->
-          <template v-else>
+          <template v-if="isLoggedIn">
             <button class="btn btn-outline-danger me-3" @click="logout">Logout</button>
             <div class="text-end me-3">
               <div class="fw-bold">{{ user?.name }}</div>
