@@ -9,7 +9,7 @@ const loading = ref(false);
 
 const startDate = ref('');
 const endDate = ref('');
-const selectedUser = ref('');
+const selectedUser = ref(null);
 
 
 const users = ref([]);
@@ -42,7 +42,7 @@ const fetchUsers = async (page = 1) => {
     });
 
     users.value = response.data.data;
-    console.log(response.data.data);
+    console.log(response);
     totalPages.value = response.data.pagination.total_pages;
     currentPage.value = page;
 
@@ -292,7 +292,7 @@ const changePage = (page) => {
                                 <td>{{ order.id }}</td>
                                 <td>{{ order.created_at }}</td>
                                 <td><span :class="getStatusBadgeClass(order.order_status)">{{ order.order_status
-                                    }}</span></td>
+                                }}</span></td>
                                 <td>${{ order.total_amount }}</td>
                                 <td>
                                   <button @click="toggleOrderItems(order.id)" class="btn btn-sm btn-outline-info">

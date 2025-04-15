@@ -36,8 +36,6 @@ const fetchUsers = async (page = 1) => {
     totalPages.value = response.data.pagination.last_page;
     currentPage.value = page;
     console.log(response);
-    // console.log(users.value);
-    // console.log(response.data.pagination);
 
   } catch (err) {
     console.error('Failed to fetch user data', err);
@@ -113,7 +111,8 @@ onMounted(() => {
           <tr v-for="(user, index) in users" :key="user.id">
             <th scope="row">{{ (currentPage - 1) * 6 + index + 1 }}</th>
             <td>
-              <img :src="user.profilePic" :alt="user.name" class="rounded-circle" width="40" height="40">
+              <img :src="user.profilePic || 'https://cdn.pixabay.com/photo/2020/07/01/12/58/icon-5359553_640.png'"
+                :alt="user.name" class="rounded-circle" width="40" height="40">
             </td>
             <td>{{ user.fullName }}</td>
             <td>{{ user.email }}</td>
