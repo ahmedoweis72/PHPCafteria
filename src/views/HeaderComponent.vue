@@ -36,7 +36,6 @@ function checkUserLogin() {
     isLoggedIn.value = true;
 
     const userInfo = userData.decodedData?.data || {};
-    console.log(userInfo.image);
 
     user.value = {
       name: userInfo.name,
