@@ -71,8 +71,8 @@ import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
-import { useProductStore } from '../stores/productStore'
-import { useCategoryStore } from '../stores/categoryStore'
+import { useProductStore } from '../../stores/productStore'
+import { useCategoryStore } from '../../stores/categoryStore'
 
 const router = useRouter()
 const route = useRoute()

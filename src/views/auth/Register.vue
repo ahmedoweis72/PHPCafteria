@@ -69,7 +69,7 @@
 </template>
 
 <script>
-import authService from '../services/auth.service';
+import authService from '../../services/auth.service';
 
 export default {
   name: 'RegisterUser',
@@ -107,7 +107,6 @@ export default {
 
         // Log the form data to check if it's being created correctly
         console.log('Sending registration data...');
-
         const response = await authService.register(formData);
         this.message = response.message || 'User registered successfully!';
         this.error = false;

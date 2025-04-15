@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import authService from '../services/auth.service'; // Make sure this path is correct
+import authService from '../../services/auth.service'; // Make sure this path is correct
 
 
 const route = useRoute();

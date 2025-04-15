@@ -58,7 +58,7 @@
 import axios from "axios";
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
-import authService from '../services/auth.service';
+import authService from '../../services/auth.service';
 
 export default {
   data() {
