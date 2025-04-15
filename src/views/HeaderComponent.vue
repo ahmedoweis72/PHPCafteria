@@ -77,6 +77,9 @@ function checkUserLogin() {
                   <router-link to="/orders" class="nav-link">My Orders</router-link>
                 </li>
                 <li class="nav-item">
+                  <router-link to="/orders-queue" class="nav-link">Orders Queue</router-link>
+                </li>
+                <li class="nav-item">
                   <router-link to="/order" class="nav-link">Manual Order</router-link>
                 </li>
               </template>

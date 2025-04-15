@@ -9,6 +9,7 @@ import EditProductComponent from './views/EditProductComponent.vue';
 import CheckComponent from './views/CheckComponent.vue';
 import OrderComponent from './views/OrderComponent.vue';
 import OrdersComponent from './views/OrdersComponent.vue';
+import OrdersQueueComponent from './views/OrdersQueueComponent.vue';
 import LoginComponent from './views/Login.vue';
 import RegisterComponent from './views/Register.vue';
 import AuthService from './services/auth.service';
@@ -62,6 +63,15 @@ const routes = [
         component:OrdersComponent,
         meta: {
             requiresAuth: true
+        }
+    },
+    {
+        path:'/orders-queue',
+        name:'Orders Queue',
+        component:OrdersQueueComponent,
+        meta: {
+            requiresAuth: true,
+            requiresAdmin: true
         }
     },
     {

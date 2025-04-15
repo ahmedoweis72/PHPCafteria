@@ -83,6 +83,47 @@ const formatDate = (dateString) => {
     })
 }
 
+// Add new refs for handling order items display
+const expandedOrders = ref(new Set())
+const orderItems = ref({})
+
+// Add new methods
+const toggleOrderItems = async (orderId) => {
+    if (expandedOrders.value.has(orderId)) {
+        expandedOrders.value.delete(orderId)
+    } else {
+        try {
+            const response = await axios.get(`${API_URL}/orders/${orderId}/info`, {
+                headers: AuthService.authHeader()
+            })
+            if (response.data.status === 'success') {
+                if (!response.data.data || response.data.data.length === 0) {
+                    toast.info('No items found for this order')
+                    return
+                }
+                orderItems.value[orderId] = response.data.data
+                expandedOrders.value.add(orderId)
+            }
+        } catch (error) {
+            toast.error('Failed to fetch order details')
+        }
+    }
+}
+
+const cancelOrder = async (orderId) => {
+    try {
+        const response = await axios.post(`${API_URL}/orders/${orderId}/cancel`, {}, {
+            headers: AuthService.authHeader()
+        })
+        if (response.data.status === 'success') {
+            toast.success('Order cancelled successfully')
+            fetchOrders() // Refresh orders list
+        }
+    } catch (error) {
+        toast.error('Failed to cancel order')
+    }
+}
+
 onMounted(() => {
     fetchOrders()
 })
@@ -151,30 +192,81 @@ onMounted(() => {
                     <table class="table table-hover">
                         <thead class="table-light">
                             <tr>
-                                <th>Order ID</th>
                                 <th>Date</th>
                                 <th>Status</th>
                                 <th class="text-end">Amount</th>
+                                <th class="text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="order in orders" :key="order.id">
-                                <td>#{{ order.id }}</td>
-                                <td>{{ formatDate(order.created_at) }}</td>
-                                <td>
-                                    <span :class="[
-                                        'badge',
-                                        {
-                                            'bg-success': order.order_status === 'completed',
-                                            'bg-warning': order.order_status === 'pending',
-                                            'bg-danger': order.order_status === 'cancelled'
-                                        }
-                                    ]">
-                                        {{ order.order_status }}
-                                    </span>
-                                </td>
-                                <td class="text-end">{{ order.total_amount }} EGP</td>
-                            </tr>
+                            <template v-for="order in orders" :key="order.id">
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <button class="btn btn-sm btn-icon me-2" @click="toggleOrderItems(order.id)"
+                                                :title="expandedOrders.has(order.id) ? 'Hide Details' : 'Show Details'">
+                                                <i class="bi"
+                                                    :class="expandedOrders.has(order.id) ? 'bi-dash-circle-fill' : 'bi-plus-circle-fill'"
+                                                    style="font-size: 1.2rem; color: #0d6efd;"></i>
+                                            </button>
+                                            <span>{{ formatDate(order.created_at) }}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span :class="[
+                                            'badge',
+                                            {
+                                                'bg-success': order.order_status.toLowerCase() === 'completed',
+                                                'bg-warning': order.order_status.toLowerCase() === 'processing',
+                                                'bg-danger': order.order_status.toLowerCase() === 'cancelled'
+                                            }
+                                        ]">
+                                            {{ order.order_status }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end">{{ order.total_amount }} EGP</td>
+                                    <td class="text-center">
+                                        <button v-if="order.order_status.toLowerCase() === 'processing'"
+                                            class="btn btn-sm btn-danger" @click="cancelOrder(order.id)">
+                                            Cancel Order
+                                        </button>
+                                    </td>
+                                </tr>
+                                <!-- Order Items Expansion Row -->
+                                <tr v-if="expandedOrders.has(order.id)">
+                                    <td colspan="4">
+                                        <div class="order-items-container p-3">
+                                            <div v-if="!orderItems[order.id] || orderItems[order.id].length === 0"
+                                                class="text-center py-4">
+                                                <i class="bi bi-inbox display-4 text-muted"></i>
+                                                <p class="mt-3 mb-0 text-muted">No items found for this order</p>
+                                            </div>
+                                            <div v-else class="row g-3">
+                                                <div v-for="item in orderItems[order.id]" :key="item.id"
+                                                    class="col-md-6">
+                                                    <div class="card h-100">
+                                                        <div class="row g-0">
+                                                            <div class="col-4">
+                                                                <img :src="item.image" class="img-fluid rounded-start"
+                                                                    :alt="item.name">
+                                                            </div>
+                                                            <div class="col-8">
+                                                                <div class="card-body">
+                                                                    <h5 class="card-title">{{ item.name }}</h5>
+                                                                    <p class="card-text">
+                                                                        Quantity: {{ item.quantity }}<br>
+                                                                        Price: {{ item.price_at_order }} EGP
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </template>
                         </tbody>
                     </table>
                 </div>
@@ -211,5 +303,49 @@ onMounted(() => {
 .badge {
     font-weight: 500;
     padding: 0.5em 0.75em;
+}
+
+.order-items-container .text-center {
+    color: #6c757d;
+}
+
+.order-items-container .bi-inbox {
+    opacity: 0.5;
+}
+
+.order-items-container .text-muted {
+    font-size: 0.9rem;
+}
+
+.card-title {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.card-text {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+img {
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+}
+
+.btn-icon {
+    padding: 0.25rem;
+    line-height: 1;
+    border: none;
+    background: transparent;
+}
+
+.btn-icon:hover {
+    background-color: rgba(13, 110, 253, 0.1);
+    border-radius: 50%;
+}
+
+.btn-icon:focus {
+    box-shadow: none;
 }
 </style>
