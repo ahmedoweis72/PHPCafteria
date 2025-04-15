@@ -36,11 +36,12 @@ function checkUserLogin() {
     isLoggedIn.value = true;
 
     const userInfo = userData.decodedData?.data || {};
+    console.log(userInfo.image);
 
     user.value = {
       name: userInfo.name,
       role: userInfo.role || "User",
-      image: userData.image || "https://cdn.pixabay.com/photo/2020/07/01/12/58/icon-5359553_640.png"
+      image: userInfo.image || "https://cdn.pixabay.com/photo/2020/07/01/12/58/icon-5359553_640.png"
     };
   } else {
     isLoggedIn.value = false;
