@@ -11,27 +11,15 @@
         <div class="row">
           <div class="col-md-6 mb-3">
             <label for="fullName">Full Name <span class="text-danger">*</span></label>
-            <input 
-              type="text" 
-              id="fullName" 
-              v-model="user.fullName" 
-              required 
-              placeholder="Enter full name" 
-              :class="{ 'input-error': errors.fullName }"
-            />
+            <input type="text" id="fullName" v-model="user.fullName" required placeholder="Enter full name"
+              :class="{ 'input-error': errors.fullName }" />
             <div v-if="errors.fullName" class="error-message">{{ errors.fullName }}</div>
           </div>
 
           <div class="col-md-6 mb-3">
             <label for="email">Email <span class="text-danger">*</span></label>
-            <input 
-              type="email" 
-              id="email" 
-              v-model="user.email" 
-              required 
-              placeholder="Enter email" 
-              :class="{ 'input-error': errors.email }"
-            />
+            <input type="email" id="email" v-model="user.email" required placeholder="Enter email"
+              :class="{ 'input-error': errors.email }" />
             <div v-if="errors.email" class="error-message">{{ errors.email }}</div>
           </div>
         </div>
@@ -39,25 +27,14 @@
         <div class="row">
           <div class="col-md-6 mb-3">
             <label for="password">Password <span class="text-danger">*</span></label>
-            <input 
-              type="password" 
-              id="password" 
-              v-model="user.password" 
-              required 
-              placeholder="Enter password" 
-              :class="{ 'input-error': errors.password }"
-            />
+            <input type="password" id="password" v-model="user.password" required placeholder="Enter password"
+              :class="{ 'input-error': errors.password }" />
             <div v-if="errors.password" class="error-message">{{ errors.password }}</div>
           </div>
 
           <div class="col-md-6 mb-3">
             <label for="role">Role <span class="text-danger">*</span></label>
-            <select 
-              id="role" 
-              v-model="user.role" 
-              required
-              :class="{ 'input-error': errors.role }"
-            >
+            <select id="role" v-model="user.role" required :class="{ 'input-error': errors.role }">
               <option value="" disabled selected>Select a role</option>
               <option value="user">User</option>
               <option value="admin">Admin</option>
@@ -85,13 +62,8 @@
 
         <div class="form-group">
           <label for="profilePic">Profile Picture</label>
-          <input 
-            type="file" 
-            id="profilePic" 
-            @change="handleFileUpload" 
-            accept="image/*" 
-            :class="{ 'input-error': errors.profilePic }"
-          />
+          <input type="file" id="profilePic" @change="handleFileUpload" accept="image/*"
+            :class="{ 'input-error': errors.profilePic }" />
           <div v-if="errors.profilePic" class="error-message">{{ errors.profilePic }}</div>
         </div>
 
@@ -106,12 +78,7 @@
 </template>
 
 <script>
-<<<<<<< HEAD:src/views/Register.vue
-import authService from '../services/auth.service';
-import axios from 'axios';
-=======
 import authService from '../../services/auth.service';
->>>>>>> c7b43759692653b8803fc90588005d2396046185:src/views/auth/Register.vue
 
 export default {
   name: 'RegisterUser',
@@ -221,24 +188,10 @@ export default {
           }
         });
 
-<<<<<<< HEAD:src/views/Register.vue
-        // Direct axios request implementation
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost/PHP_Cafeteria_Backend/public';
-
-        const response = await axios.post(`${API_URL}/admin/users`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            ...authService.authHeader()
-          }
-        });
-
-        this.message = response.data.message || 'User registered successfully!';
-=======
         // Log the form data to check if it's being created correctly
         console.log('Sending registration data...');
         const response = await authService.register(formData);
         this.message = response.message || 'User registered successfully!';
->>>>>>> c7b43759692653b8803fc90588005d2396046185:src/views/auth/Register.vue
         this.error = false;
 
         // Reset form after successful registration
@@ -247,7 +200,7 @@ export default {
         console.error('Registration error:', err);
         this.error = true;
         this.message = err.response?.data?.message || err.message || 'Failed to register user!';
-        
+
         // Handle validation errors from backend
         if (err.response?.data?.errors) {
           const backendErrors = err.response.data.errors;
@@ -456,6 +409,7 @@ button:disabled {
 }
 
 @media (max-width: 767px) {
+
   .col-md-6,
   .col-md-4 {
     flex: 0 0 100%;

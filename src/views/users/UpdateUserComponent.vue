@@ -20,10 +20,6 @@ const showConfirmPassword = ref(false);
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost/PHP_Cafeteria_Backend/public';
 
-<<<<<<< HEAD:src/views/UpdateUserComponent.vue
-=======
-
->>>>>>> c7b43759692653b8803fc90588005d2396046185:src/views/users/UpdateUserComponent.vue
 const fetchUser = async (userId) => {
   try {
     loading.value = true;
@@ -43,12 +39,12 @@ const fetchUser = async (userId) => {
 
 const validateForm = () => {
   validationErrors.value = {};
-  
+
   // Validate full name
   if (!user.value.fullName?.trim()) {
     validationErrors.value.fullName = 'Full name is required';
   }
-  
+
   // Validate email
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!user.value.email?.trim()) {
@@ -56,23 +52,23 @@ const validateForm = () => {
   } else if (!emailRegex.test(user.value.email)) {
     validationErrors.value.email = 'Please enter a valid email address';
   }
-  
+
   // Validate role
   if (!user.value.role) {
     validationErrors.value.role = 'Role is required';
   }
-  
+
   // Validate passwords if provided
   if (password.value) {
     if (password.value.length < 6) {
       validationErrors.value.password = 'Password must be at least 6 characters long';
     }
-    
+
     if (password.value !== confirmPassword.value) {
       validationErrors.value.confirmPassword = 'Passwords do not match';
     }
   }
-  
+
   // Validate image if provided
   if (newImageFile.value) {
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
@@ -82,14 +78,14 @@ const validateForm = () => {
       validationErrors.value.profilePic = 'Image size should not exceed 5MB';
     }
   }
-  
+
   return Object.keys(validationErrors.value).length === 0;
 };
 
 const updateUserData = async () => {
   error.value = null;
   success.value = null;
-  
+
   if (!validateForm()) {
     error.value = 'Please fix the validation errors before submitting';
     return;
@@ -98,12 +94,12 @@ const updateUserData = async () => {
   let formData = new FormData();
   formData.append('fullName', user.value.fullName);
   formData.append('email', user.value.email);
-  
+
   // Only append if values exist
   if (user.value.roomNum) {
     formData.append('roomNum', user.value.roomNum);
   }
-  
+
   formData.append('role', user.value.role);
 
   if (password.value) {
@@ -116,20 +112,12 @@ const updateUserData = async () => {
 
   try {
     loading.value = true;
-<<<<<<< HEAD:src/views/UpdateUserComponent.vue
-    const response = await axios.post(`${API_URL}/users/${userId}`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        ...authService.authHeader()
-      }
-=======
     await axios.post(`${API_URL}/users/${userId}`, formData, {
       headers: authService.authHeader()
->>>>>>> c7b43759692653b8803fc90588005d2396046185:src/views/users/UpdateUserComponent.vue
     });
 
     success.value = 'User updated successfully!';
-    
+
     // Show success message briefly before redirecting
     setTimeout(() => {
       router.push('/users');
@@ -138,7 +126,7 @@ const updateUserData = async () => {
   } catch (err) {
     console.error('Failed to update user', err);
     error.value = err.response?.data?.message || 'Failed to update user';
-    
+
     // Handle validation errors from backend
     if (err.response?.data?.errors) {
       Object.assign(validationErrors.value, err.response.data.errors);
@@ -181,7 +169,7 @@ onMounted(() => {
     {{ error }}
     <button type="button" class="btn-close" @click="error = null"></button>
   </div>
-  
+
   <div v-if="success" class="alert alert-success alert-dismissible fade show" role="alert">
     {{ success }}
     <button type="button" class="btn-close" @click="success = null"></button>
@@ -227,15 +215,9 @@ onMounted(() => {
             <!-- Full Name -->
             <div class="col-md-6 mb-3">
               <label for="fullName" class="form-label">Full Name <span class="text-danger">*</span></label>
-              <input 
-                v-model="user.fullName" 
-                type="text" 
-                class="form-control" 
-                :class="{'is-invalid': validationErrors.fullName}"
-                id="fullName"
-                placeholder="Enter full name" 
-                required
-              />
+              <input v-model="user.fullName" type="text" class="form-control"
+                :class="{ 'is-invalid': validationErrors.fullName }" id="fullName" placeholder="Enter full name"
+                required />
               <div v-if="validationErrors.fullName" class="invalid-feedback">
                 {{ validationErrors.fullName }}
               </div>
@@ -244,15 +226,8 @@ onMounted(() => {
             <!-- Email -->
             <div class="col-md-6 mb-3">
               <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
-              <input 
-                v-model="user.email" 
-                type="email" 
-                class="form-control" 
-                :class="{'is-invalid': validationErrors.email}"
-                id="email" 
-                placeholder="Enter email" 
-                required
-              />
+              <input v-model="user.email" type="email" class="form-control"
+                :class="{ 'is-invalid': validationErrors.email }" id="email" placeholder="Enter email" required />
               <div v-if="validationErrors.email" class="invalid-feedback">
                 {{ validationErrors.email }}
               </div>
@@ -261,25 +236,15 @@ onMounted(() => {
             <!-- Room Number -->
             <div class="col-md-6 mb-3">
               <label for="roomNumber" class="form-label">Room Number</label>
-              <input 
-                v-model="user.roomNum" 
-                type="text" 
-                class="form-control" 
-                id="roomNumber"
-                placeholder="Enter room number" 
-              />
+              <input v-model="user.roomNum" type="text" class="form-control" id="roomNumber"
+                placeholder="Enter room number" />
             </div>
 
             <!-- Role -->
             <div class="col-md-6 mb-3">
               <label for="role" class="form-label">Role <span class="text-danger">*</span></label>
-              <select 
-                v-model="user.role" 
-                class="form-select" 
-                :class="{'is-invalid': validationErrors.role}"
-                id="role"
-                required
-              >
+              <select v-model="user.role" class="form-select" :class="{ 'is-invalid': validationErrors.role }" id="role"
+                required>
                 <option value="" disabled>Select role</option>
                 <option value="user">User</option>
                 <option value="admin">Admin</option>
@@ -293,14 +258,9 @@ onMounted(() => {
             <div class="col-md-6 mb-3">
               <label for="password" class="form-label">New Password</label>
               <div class="input-group">
-                <input 
-                  v-model="password" 
-                  :type="showPassword ? 'text' : 'password'" 
-                  class="form-control" 
-                  :class="{'is-invalid': validationErrors.password}"
-                  id="password"
-                  placeholder="Leave blank to keep current password" 
-                />
+                <input v-model="password" :type="showPassword ? 'text' : 'password'" class="form-control"
+                  :class="{ 'is-invalid': validationErrors.password }" id="password"
+                  placeholder="Leave blank to keep current password" />
                 <button class="btn btn-outline-secondary" type="button" @click="togglePasswordVisibility('password')">
                   <i class="bi" :class="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
                 </button>
@@ -314,14 +274,9 @@ onMounted(() => {
             <div class="col-md-6 mb-3">
               <label for="confirmPassword" class="form-label">Confirm New Password</label>
               <div class="input-group">
-                <input 
-                  v-model="confirmPassword" 
-                  :type="showConfirmPassword ? 'text' : 'password'" 
-                  class="form-control" 
-                  :class="{'is-invalid': validationErrors.confirmPassword}"
-                  id="confirmPassword"
-                  placeholder="Confirm password" 
-                />
+                <input v-model="confirmPassword" :type="showConfirmPassword ? 'text' : 'password'" class="form-control"
+                  :class="{ 'is-invalid': validationErrors.confirmPassword }" id="confirmPassword"
+                  placeholder="Confirm password" />
                 <button class="btn btn-outline-secondary" type="button" @click="togglePasswordVisibility('confirm')">
                   <i class="bi" :class="showConfirmPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
                 </button>
@@ -336,7 +291,8 @@ onMounted(() => {
           <div class="d-flex justify-content-end gap-2">
             <button @click.prevent="goBack" type="button" class="btn btn-secondary">Cancel</button>
             <button type="submit" class="btn btn-primary" :disabled="loading">
-              <span v-if="loading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              <span v-if="loading" class="spinner-border spinner-border-sm me-2" role="status"
+                aria-hidden="true"></span>
               {{ loading ? 'Updating...' : 'Update User' }}
             </button>
           </div>
