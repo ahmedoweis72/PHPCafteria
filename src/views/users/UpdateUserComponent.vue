@@ -16,13 +16,12 @@ const newImageFile = ref(null);
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost/PHP_Cafeteria_Backend/public';
 
-const token = authService.authHeader().Authorization || '';
 
 const fetchUser = async (userId) => {
   try {
     loading.value = true;
     const response = await axios.get(`${API_URL}/users/${userId}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
+      headers: authService.authHeader()
     });
 
     user.value = response.data;
@@ -62,9 +61,7 @@ const updateUserData = async () => {
   try {
     loading.value = true;
     await axios.post(`${API_URL}/users/${userId}`, formData, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      }
+      headers: authService.authHeader()
     });
 
 
