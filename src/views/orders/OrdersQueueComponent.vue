@@ -160,7 +160,17 @@ onMounted(() => {
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div class="order-total mt-3 p-2 bg-light border-top">
+                                                <div class="d-flex justify-content-end align-items-center">
+                                                    <h5 class="mb-0">
+                                                        Total Amount: <span class="text-primary">{{
+                                                            order.total_amount }} EGP</span>
+                                                    </h5>
+                                                </div>
+                                            </div>
+
                                         </div>
+
                                     </td>
                                 </tr>
                             </template>
