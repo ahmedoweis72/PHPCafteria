@@ -10,6 +10,7 @@ import CheckComponent from './views/CheckComponent.vue';
 import OrderComponent from './views/OrderComponent.vue';
 import LoginComponent from './views/Login.vue';
 import RegisterComponent from './views/Register.vue';
+import authService from './services/auth.service';
 
 const routes = [
     // {
@@ -35,7 +36,8 @@ const routes = [
     {
         path:'/users',
         name:'All users',
-        component:UsersComponent
+        component:UsersComponent,
+        meta:{requireAdmin:true}
     },
     {
         path:'/order',
@@ -65,7 +67,8 @@ const routes = [
     {
         path:'/checks',
         name:'checks',
-        component:CheckComponent
+        component:CheckComponent,
+        meta:{requireAdmin:true}
     },
     {
         path: '/:pathMatch(.*)*',
@@ -74,9 +77,24 @@ const routes = [
     }
 ]
 
+
 const router = createRouter({
     history: createWebHistory(),
     routes
 })
+
+//Adding guard to protect routes 
+router.beforeEach((to,from,next)=>{
+    if(to.meta.requireAdmin){
+        if(authService.isAdmin()){
+            next();
+        }else{
+            next({name:'Login'});
+        }
+    }else{
+        next();
+    }
+})
+
 
 export default router

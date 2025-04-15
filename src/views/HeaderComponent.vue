@@ -1,8 +1,10 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import AuthService from '../services/auth.service'; // Make sure this path is correct
 
+
+const route = useRoute();
 const router = useRouter();
 const isLoggedIn = ref(false);
 const user = ref(null);
@@ -22,13 +24,19 @@ onMounted(() => {
   checkUserLogin();
 });
 
+
+// Add this watcher: for route changes watch and trigger the function again
+watch(() => route.fullPath, () => {
+  checkUserLogin();
+});
+
 function checkUserLogin() {
   const userData = AuthService.getCurrentUser();
   if (userData && userData.token) {
     isLoggedIn.value = true;
-    
+
     const userInfo = userData.decodedData?.data || {};
-    
+
     user.value = {
       name: userInfo.name,
       role: userInfo.role || "User",
@@ -57,15 +65,18 @@ function checkUserLogin() {
                 <li class="nav-item">
                   <router-link to="/all-product" class="nav-link">Products</router-link>
                 </li>
-                <li class="nav-item">
-                  <router-link to="/users" class="nav-link">Users</router-link>
-                </li>
+                <template v-if="user.role === 'admin'">
+                  <li class="nav-item">
+                    <router-link to="/users" class="nav-link">Users</router-link>
+                  </li>
+                  <li class="nav-item">
+                    <router-link to="/checks" class="nav-link">Checks</router-link>
+                  </li>
+                </template>
                 <li class="nav-item">
                   <router-link to="/order" class="nav-link">Manual Order</router-link>
                 </li>
-                <li class="nav-item">
-                  <router-link to="/checks" class="nav-link">Checks</router-link>
-                </li>
+
               </template>
             </ul>
           </nav>
@@ -76,7 +87,7 @@ function checkUserLogin() {
           <template v-if="!isLoggedIn">
             <button class="btn btn-primary" @click="login">Login</button>
           </template>
-          
+
           <!-- Show user info and logout button if logged in -->
           <template v-else>
             <button class="btn btn-outline-danger me-3" @click="logout">Logout</button>
