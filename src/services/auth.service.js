@@ -52,17 +52,15 @@ class AuthService {
 
   getCurrentUser() {
     const user = JSON.parse(localStorage.getItem('user'));
-    if (user && user.token) {
+    if (user) {
       try {
         const payload = user.token.split('.')[1];
         const decoded = JSON.parse(atob(payload));
         return { ...user, decodedData: decoded };
       } catch (error) {
         console.error('Error decoding token:', error);
-        return user;
       }
     }
-    return user;
   }
 
   isAdmin() {
