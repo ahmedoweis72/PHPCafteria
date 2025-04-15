@@ -21,7 +21,10 @@ const updateUser = (userId) => {
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost/PHP_Cafeteria_Backend/public';
 
 
+<<<<<<< HEAD:src/views/UsersComponent.vue
+=======
 
+>>>>>>> c7b43759692653b8803fc90588005d2396046185:src/views/users/UsersComponent.vue
 const fetchUsers = async (page = 1) => {
   try {
     loading.value = true;

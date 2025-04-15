@@ -11,28 +11,58 @@
         <div class="row">
           <div class="col-md-6 mb-3">
             <label for="fullName">Full Name <span class="text-danger">*</span></label>
-            <input type="text" id="fullName" v-model="user.fullName" required placeholder="Enter full name" />
+            <input 
+              type="text" 
+              id="fullName" 
+              v-model="user.fullName" 
+              required 
+              placeholder="Enter full name" 
+              :class="{ 'input-error': errors.fullName }"
+            />
+            <div v-if="errors.fullName" class="error-message">{{ errors.fullName }}</div>
           </div>
 
           <div class="col-md-6 mb-3">
             <label for="email">Email <span class="text-danger">*</span></label>
-            <input type="email" id="email" v-model="user.email" required placeholder="Enter email" />
+            <input 
+              type="email" 
+              id="email" 
+              v-model="user.email" 
+              required 
+              placeholder="Enter email" 
+              :class="{ 'input-error': errors.email }"
+            />
+            <div v-if="errors.email" class="error-message">{{ errors.email }}</div>
           </div>
         </div>
 
         <div class="row">
           <div class="col-md-6 mb-3">
             <label for="password">Password <span class="text-danger">*</span></label>
-            <input type="password" id="password" v-model="user.password" required placeholder="Enter password" />
+            <input 
+              type="password" 
+              id="password" 
+              v-model="user.password" 
+              required 
+              placeholder="Enter password" 
+              :class="{ 'input-error': errors.password }"
+            />
+            <div v-if="errors.password" class="error-message">{{ errors.password }}</div>
           </div>
 
           <div class="col-md-6 mb-3">
             <label for="role">Role <span class="text-danger">*</span></label>
-            <select id="role" v-model="user.role" required>
+            <select 
+              id="role" 
+              v-model="user.role" 
+              required
+              :class="{ 'input-error': errors.role }"
+            >
               <option value="" disabled selected>Select a role</option>
               <option value="user">User</option>
               <option value="admin">Admin</option>
             </select>
+            <div v-if="errors.role" class="error-message">{{ errors.role }}</div>
           </div>
         </div>
 
@@ -55,7 +85,14 @@
 
         <div class="form-group">
           <label for="profilePic">Profile Picture</label>
-          <input type="file" id="profilePic" @change="handleFileUpload" accept="image/*" />
+          <input 
+            type="file" 
+            id="profilePic" 
+            @change="handleFileUpload" 
+            accept="image/*" 
+            :class="{ 'input-error': errors.profilePic }"
+          />
+          <div v-if="errors.profilePic" class="error-message">{{ errors.profilePic }}</div>
         </div>
 
         <button type="submit" :disabled="loading">
@@ -69,7 +106,12 @@
 </template>
 
 <script>
+<<<<<<< HEAD:src/views/Register.vue
+import authService from '../services/auth.service';
+import axios from 'axios';
+=======
 import authService from '../../services/auth.service';
+>>>>>>> c7b43759692653b8803fc90588005d2396046185:src/views/auth/Register.vue
 
 export default {
   name: 'RegisterUser',
@@ -87,11 +129,85 @@ export default {
       },
       loading: false,
       message: '',
-      error: false
+      error: false,
+      errors: {
+        fullName: '',
+        email: '',
+        password: '',
+        role: '',
+        profilePic: ''
+      }
     };
   },
   methods: {
+    validateForm() {
+      let isValid = true;
+      this.clearErrors();
+
+      // Validate full name
+      if (!this.user.fullName.trim()) {
+        this.errors.fullName = 'Full name is required';
+        isValid = false;
+      } else if (this.user.fullName.length < 2) {
+        this.errors.fullName = 'Full name must be at least 2 characters';
+        isValid = false;
+      }
+
+      // Validate email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!this.user.email.trim()) {
+        this.errors.email = 'Email is required';
+        isValid = false;
+      } else if (!emailRegex.test(this.user.email)) {
+        this.errors.email = 'Please enter a valid email address';
+        isValid = false;
+      }
+
+      // Validate password
+      if (!this.user.password) {
+        this.errors.password = 'Password is required';
+        isValid = false;
+      } else if (this.user.password.length < 6) {
+        this.errors.password = 'Password must be at least 6 characters long';
+        isValid = false;
+      }
+
+      // Validate role
+      if (!this.user.role) {
+        this.errors.role = 'Please select a role';
+        isValid = false;
+      }
+
+      // Optional: Validate profile picture
+      if (this.user.profilePic) {
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        if (!allowedTypes.includes(this.user.profilePic.type)) {
+          this.errors.profilePic = 'Please upload a valid image file (JPEG, PNG, GIF, WEBP)';
+          isValid = false;
+        } else if (this.user.profilePic.size > 5 * 1024 * 1024) { // 5MB limit
+          this.errors.profilePic = 'Image size should not exceed 5MB';
+          isValid = false;
+        }
+      }
+
+      return isValid;
+    },
+
+    clearErrors() {
+      this.errors = {
+        fullName: '',
+        email: '',
+        password: '',
+        role: '',
+        profilePic: ''
+      };
+    },
+
     async handleRegister() {
+      if (!this.validateForm()) {
+        return;
+      }
+
       this.loading = true;
       this.message = '';
       this.error = false;
@@ -105,33 +221,65 @@ export default {
           }
         });
 
+<<<<<<< HEAD:src/views/Register.vue
+        // Direct axios request implementation
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost/PHP_Cafeteria_Backend/public';
+
+        const response = await axios.post(`${API_URL}/admin/users`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            ...authService.authHeader()
+          }
+        });
+
+        this.message = response.data.message || 'User registered successfully!';
+=======
         // Log the form data to check if it's being created correctly
         console.log('Sending registration data...');
         const response = await authService.register(formData);
         this.message = response.message || 'User registered successfully!';
+>>>>>>> c7b43759692653b8803fc90588005d2396046185:src/views/auth/Register.vue
         this.error = false;
 
         // Reset form after successful registration
-        this.user = {
-          fullName: '',
-          email: '',
-          password: '',
-          role: '',
-          roomNum: '',
-          Ext: '',
-          profilePic: null,
-          roomId: ''
-        };
+        this.resetForm();
       } catch (err) {
         console.error('Registration error:', err);
         this.error = true;
-        this.message = err.message || 'Failed to register user!';
+        this.message = err.response?.data?.message || err.message || 'Failed to register user!';
+        
+        // Handle validation errors from backend
+        if (err.response?.data?.errors) {
+          const backendErrors = err.response.data.errors;
+          Object.keys(backendErrors).forEach(field => {
+            if (this.errors.hasOwnProperty(field)) {
+              this.errors[field] = backendErrors[field];
+            }
+          });
+        }
       } finally {
         this.loading = false;
       }
     },
+
+    resetForm() {
+      this.user = {
+        fullName: '',
+        email: '',
+        password: '',
+        role: '',
+        roomNum: '',
+        Ext: '',
+        profilePic: null,
+        roomId: ''
+      };
+      document.getElementById('profilePic').value = '';
+    },
+
     handleFileUpload(event) {
       this.user.profilePic = event.target.files[0];
+      // Clear any previous file upload errors
+      this.errors.profilePic = '';
     }
   },
   created() {
@@ -228,6 +376,16 @@ select:focus {
   box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
 }
 
+.input-error {
+  border-color: #dc3545;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
 button {
   width: 100%;
   padding: 12px;
@@ -297,25 +455,7 @@ button:disabled {
   border: 1px solid #c3e6cb;
 }
 
-.redirect-link {
-  margin-top: 20px;
-  text-align: center;
-  font-size: 14px;
-  color: #666;
-}
-
-.redirect-link a {
-  color: #4CAF50;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.redirect-link a:hover {
-  text-decoration: underline;
-}
-
 @media (max-width: 767px) {
-
   .col-md-6,
   .col-md-4 {
     flex: 0 0 100%;

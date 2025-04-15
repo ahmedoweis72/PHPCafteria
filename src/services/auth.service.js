@@ -52,7 +52,7 @@ class AuthService {
 
   getCurrentUser() {
     const user = JSON.parse(localStorage.getItem('user'));
-    if (user && user.token) {
+    if (user) {
       try {
         const payload = user.token.split('.')[1];
         const decoded = JSON.parse(atob(payload));

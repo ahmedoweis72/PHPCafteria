@@ -3,6 +3,7 @@ import AddProductComponent from './views/products/AddProductComponent.vue'
 import AllProductComponent from './views/products/AllProductComponent.vue'
 import UsersComponent from './views/users/UsersComponent.vue';
 import NotFound from './views/NotFound.vue'
+import OrderDetails from './views/OrderDetails.vue';
 import AddCategoryComponent from './views/category/AddCategoryComponent.vue'
 import UpdateUserComponent from './views/users/UpdateUserComponent.vue';
 import EditProductComponent from './views/products/EditProductComponent.vue';
