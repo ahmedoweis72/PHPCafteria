@@ -59,10 +59,8 @@ class AuthService {
         return { ...user, decodedData: decoded };
       } catch (error) {
         console.error('Error decoding token:', error);
-        return user;
       }
     }
-    return user;
   }
 
   isAdmin() {

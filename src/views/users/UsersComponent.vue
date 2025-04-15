@@ -35,7 +35,6 @@ const fetchUsers = async (page = 1) => {
     users.value = response.data.data;
     totalPages.value = response.data.pagination.last_page;
     currentPage.value = page;
-    console.log(response);
 
   } catch (err) {
     console.error('Failed to fetch user data', err);
