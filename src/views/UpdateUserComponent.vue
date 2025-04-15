@@ -52,7 +52,9 @@ const updateUserData = async () => {
 
   try {
     loading.value = true;
-    await axios.patch(`${API_URL}/users/${userId}`, updatedUser);
+    await axios.patch(`${API_URL}/users/${userId}`, updatedUser, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
 
     router.push('/users');
 

@@ -68,6 +68,10 @@ const deleteUser = async (UserId) => {
 
 }
 
+const goToRegister = () => {
+  router.push({ name: 'Register' });
+}
+
 onMounted(() => {
   fetchUsers(1);
 })
@@ -79,7 +83,7 @@ onMounted(() => {
   <div class="users-container">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h1 class="h2">All Users</h1>
-      <button class="btn btn-primary">
+      <button @click="goToRegister" class="btn btn-primary">
         <i class="bi bi-plus-circle me-2"></i> Add User
       </button>
     </div>

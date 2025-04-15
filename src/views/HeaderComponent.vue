@@ -1,8 +1,10 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import AuthService from '../services/auth.service'; // Make sure this path is correct
 
+
+const route = useRoute();
 const router = useRouter();
 const isLoggedIn = ref(false);
 const user = ref(null);
@@ -19,6 +21,12 @@ function login() {
 }
 
 onMounted(() => {
+  checkUserLogin();
+});
+
+
+// Add this watcher: for route changes watch and trigger the function again
+watch(() => route.fullPath, () => {
   checkUserLogin();
 });
 
@@ -57,17 +65,16 @@ function checkUserLogin() {
                 <li class="nav-item">
                   <router-link to="/all-product" class="nav-link">Products</router-link>
                 </li>
-                <li class="nav-item" v-if="user.role === 'Admin'">
-                  <router-link to="/users" class="nav-link">Users</router-link>
-                </li>
-                <li class="nav-item" v-if="user.role === 'user'">
-                  <router-link to="/orders" class="nav-link">My Orders</router-link>
-                </li>
+                <template v-if="user.role === 'admin'">
+                  <li class="nav-item">
+                    <router-link to="/users" class="nav-link">Users</router-link>
+                  </li>
+                  <li class="nav-item">
+                    <router-link to="/checks" class="nav-link">Checks</router-link>
+                  </li>
+                </template>
                 <li class="nav-item">
                   <router-link to="/order" class="nav-link">Manual Order</router-link>
-                </li>
-                <li class="nav-item" v-if="user.role === 'Admin'">
-                  <router-link to="/checks" class="nav-link">Checks</router-link>
                 </li>
               </template>
             </ul>

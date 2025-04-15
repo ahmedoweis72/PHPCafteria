@@ -11,7 +11,7 @@ import OrderComponent from './views/OrderComponent.vue';
 import OrdersComponent from './views/OrdersComponent.vue';
 import LoginComponent from './views/Login.vue';
 import RegisterComponent from './views/Register.vue';
-import AuthService from './services/auth.service';
+import authService from './services/auth.service';
 
 const routes = [
     {
@@ -112,10 +112,12 @@ const routes = [
     }
 ]
 
+
 const router = createRouter({
     history: createWebHistory(),
     routes
 })
+
 
 router.beforeEach(async (to, from) => {
     if (to.meta.requiresAuth && !AuthService.isLoggedIn()) {
@@ -133,5 +135,6 @@ router.beforeEach(async (to, from) => {
         return { path: '/' }
     }
 })
+
 
 export default router
