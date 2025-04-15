@@ -86,18 +86,25 @@ export default {
   },
   methods: {
     addToCart(product) {
-      const existingItem = this.cart.find(item => item.id === product.id);
-      if (existingItem) {
-   
-    existingItem.quantity = (existingItem.quantity || 1) + 1;
+  const existingItem = this.cart.find(item => item.product_id === product.id);
+
+  if (existingItem) {
+    existingItem.quantity += 1;
   } else {
-    
-    this.cart.push({ ...product, quantity: 1 });
+    const cartItem = {
+      product_id: product.id,
+      name: product.name,
+      price: parseFloat(product.price),
+      image: product.image,
+      quantity: 1,
+      notes: ''
+    };
+    this.cart.push(cartItem);
   }
-      
-      localStorage.setItem('cart', JSON.stringify(this.cart));
-      console.log('Added to cart:', product);
-    },
+
+  localStorage.setItem('cart', JSON.stringify(this.cart));
+  console.log('Added to cart:', product);
+},
     removeFromCart(item) {
       
       const index = this.cart.indexOf(item);
