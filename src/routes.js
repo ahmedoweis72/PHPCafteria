@@ -6,7 +6,6 @@ import NotFound from './views/NotFound.vue'
 import AddCategoryComponent from './views/AddCategoryComponent.vue'
 import UpdateUserComponent from './views/UpdateUserComponent.vue';
 import EditProductComponent from './views/EditProductComponent.vue';
-import OrdersList from './views/OrdersList.vue';
 import OrderDetails from './views/OrderDetails.vue';
 import HomeComponent from './views/HomeView.vue';
 import CheckComponent from './views/CheckComponent.vue';
@@ -41,7 +40,7 @@ const routes = [
         name:'Register',
         component:RegisterComponent,
         meta: {
-            requiresGuest : true
+            requiresAdmin : true
         }
     },
     {
