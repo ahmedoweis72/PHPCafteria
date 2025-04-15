@@ -1,13 +1,14 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import authService from '../services/auth.service'; // Make sure this path is correct
+import authService from '../../services/auth.service'; // Make sure this path is correct
 
 
 const route = useRoute();
 const router = useRouter();
 const isLoggedIn = ref(false);
 const user = ref(null);
+const cartCount = ref(0);
 
 function logout() {
   authService.logout();
@@ -36,18 +37,24 @@ function checkUserLogin() {
     isLoggedIn.value = true;
 
     const userInfo = userData.decodedData?.data || {};
-    console.log(userInfo.image);
 
     user.value = {
       name: userInfo.name,
-      role: userInfo.role || "User",
-      image: userInfo.image || "https://cdn.pixabay.com/photo/2020/07/01/12/58/icon-5359553_640.png"
+      role: userInfo.role || 'User',
+      image: userData.image || 'https://cdn.pixabay.com/photo/2020/07/01/12/58/icon-5359553_640.png'
     };
   } else {
     isLoggedIn.value = false;
     user.value = null;
   }
 }
+
+onMounted(() => {
+  checkUserLogin();
+  const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+  cartCount.value = cartItems.reduce((total, item) => total + item.quantity, 0);
+
+});
 </script>
 
 <template>
@@ -61,12 +68,13 @@ function checkUserLogin() {
               <li class="nav-item">
                 <router-link to="/" class="nav-link">Home</router-link>
               </li>
+
               <!-- Only show these if user is logged in -->
               <template v-if="isLoggedIn">
-                <li class="nav-item">
-                  <router-link to="/all-product" class="nav-link">Products</router-link>
-                </li>
                 <template v-if="user.role === 'admin'">
+                  <li class="nav-item">
+                    <router-link to="/all-product" class="nav-link">Products</router-link>
+                  </li>
                   <li class="nav-item">
                     <router-link to="/users" class="nav-link">Users</router-link>
                   </li>
@@ -76,16 +84,23 @@ function checkUserLogin() {
                   <li class="nav-item">
                     <router-link to="/orders-queue" class="nav-link">Orders Queue</router-link>
                   </li>
+                  <li class="nav-item">
+                    <router-link to="/order" class="nav-link">Manual Order</router-link>
+                  </li>
                 </template>
                 <li class="nav-item">
-                  <router-link to="/orders" class="nav-link">My Orders</router-link>
-                </li>
-                <li class="nav-item">
-                  <router-link to="/order" class="nav-link">Manual Order</router-link>
+                  <router-link to="/orders" class="nav-link" v-if="user.role === 'user'">My Orders</router-link>
                 </li>
               </template>
             </ul>
           </nav>
+
+          <div class="cart-icon">
+            <router-link to="/cart" class="nav-link">
+              <i class="fa fa-shopping-cart"></i>
+              <span class="badge badge-pill badge-primary">{{ cartCount }}</span>
+            </router-link>
+          </div>
         </div>
 
         <div class="col-auto d-flex align-items-center">
@@ -98,10 +113,10 @@ function checkUserLogin() {
           <template v-else>
             <button class="btn btn-outline-danger me-3" @click="logout">Logout</button>
             <div class="text-end me-3">
-              <div class="fw-bold">{{ user.name }}</div>
-              <div class="text-muted small">{{ user.role }}</div>
+              <div class="fw-bold">{{ user?.name }}</div>
+              <div class="text-muted small">{{ user?.role }}</div>
             </div>
-            <img :src="user.image" alt="User" class="rounded-circle" width="40" height="40">
+            <img :src="user?.image" alt="User" class="rounded-circle" width="40" height="40">
           </template>
         </div>
       </div>
@@ -110,7 +125,6 @@ function checkUserLogin() {
 </template>
 
 <style scoped>
-/* Override Bootstrap's active link color */
 .nav-link.router-link-active {
   color: #42b983 !important;
   font-weight: 500;

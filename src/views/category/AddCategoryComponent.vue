@@ -109,7 +109,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { useCategoryStore } from '../stores/categoryStore'
+import { useCategoryStore } from '../../stores/categoryStore'
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
 

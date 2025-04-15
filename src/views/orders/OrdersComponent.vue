@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
-import authService from '../services/auth.service'
+import authService from '../../services/auth.service'
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
 
@@ -112,7 +112,17 @@ const toggleOrderItems = async (orderId) => {
 
 const cancelOrder = async (orderId) => {
     try {
-        const response = await axios.post(`${API_URL}/orders/${orderId}/cancel`, {}, {
+        const order = orders.value.find(o => o.id === orderId);
+        if (!order) {
+            console.error(`Order ${orderId} not found`);
+            return;
+        }
+        console.log(order);
+        const order_status = order?.order_status;
+        console.log(order_status);
+        const response = await axios.patch(`${API_URL}/orders/${orderId}/cancel`, {
+            status: order_status
+        }, {
             headers: authService.authHeader()
         })
         if (response.data.status === 'success') {
@@ -255,7 +265,7 @@ onMounted(() => {
                                                                     <h5 class="card-title">{{ item.name }}</h5>
                                                                     <p class="card-text">
                                                                         Quantity: {{ item.quantity }}<br>
-                                                                        Price: {{ item.price_at_order }} EGP
+                                                                        Price: {{ item.price }} EGP
                                                                     </p>
                                                                 </div>
                                                             </div>

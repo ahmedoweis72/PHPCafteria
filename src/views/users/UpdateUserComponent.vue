@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { useRoute, useRouter } from 'vue-router';
-import authService from '../services/auth.service';
+import authService from '../../services/auth.service';
 
 const user = ref({});
 const route = useRoute();

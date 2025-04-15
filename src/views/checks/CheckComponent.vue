@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import authService from '../services/auth.service';
+import authService from '../../services/auth.service';
 
 const currentPage = ref(1);
 const totalPages = ref(1);
@@ -291,7 +291,7 @@ const changePage = (page) => {
                                 <td>{{ order.id }}</td>
                                 <td>{{ order.created_at }}</td>
                                 <td><span :class="getStatusBadgeClass(order.order_status)">{{ order.order_status
-                                    }}</span></td>
+                                }}</span></td>
                                 <td>${{ order.total_amount }}</td>
                                 <td>
                                   <button @click="toggleOrderItems(order.id)" class="btn btn-sm btn-outline-info">
