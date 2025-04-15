@@ -67,7 +67,9 @@ export default {
     };
   },
   mounted() {
-    fetch('http://localhost/PHP_Cafeteria_Backend/public/rooms')
+    this.userId = localStorage.getItem('id');
+    console.log('userId:', this.userId);
+    fetch('http://localhost:8000/rooms')
       .then(res => res.json())
       .then(data => {
         this.rooms = data;
@@ -112,8 +114,8 @@ export default {
       notes: item.notes || ''
     }))
   };
-
-  axios.post('http://localhost/PHP_Cafeteria_Backend/public/orders', orderData, {
+  console.log(orderData)
+  axios.post('http://localhost:8000/orders', orderData, {
     headers: {
       'Content-Type': 'application/json'
     }
