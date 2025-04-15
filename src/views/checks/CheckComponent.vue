@@ -45,6 +45,14 @@ const fetchUsers = async (page = 1) => {
     totalPages.value = response.data.pagination.total_pages;
     currentPage.value = page;
 
+    const currentUser = authService.getCurrentUser();
+    const currentUserImage = currentUser?.decodedData?.data?.image || '';
+
+    users.value = response.data.data.map(user => ({
+      ...user,
+      profilePic: user.profilePic || (user.user_id === currentUser?.decodedData?.data?.id ? currentUserImage : '')
+    }));
+
 
   } catch (err) {
     console.error('Failed to fetch user data', err);
@@ -244,7 +252,7 @@ const changePage = (page) => {
                   <td>{{ index + 1 + (currentPage - 1) * 6 }}</td>
                   <td>
                     <img
-                      :src="user.profilePicture || 'https://image.shutterstock.com/image-vector/vector-flat-illustration-grayscale-avatar-260nw-2281862025.jpg'"
+                      :src="user.profilePic || 'https://image.shutterstock.com/image-vector/vector-flat-illustration-grayscale-avatar-260nw-2281862025.jpg'"
                       :alt="user.fullName" class=" rounded-circle" width="40" height="40">
                   </td>
                   <td>{{ user.fullName }}</td>
@@ -291,7 +299,7 @@ const changePage = (page) => {
                                 <td>{{ order.id }}</td>
                                 <td>{{ order.created_at }}</td>
                                 <td><span :class="getStatusBadgeClass(order.order_status)">{{ order.order_status
-                                }}</span></td>
+                                    }}</span></td>
                                 <td>${{ order.total_amount }}</td>
                                 <td>
                                   <button @click="toggleOrderItems(order.id)" class="btn btn-sm btn-outline-info">
