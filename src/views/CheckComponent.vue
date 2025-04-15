@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
+import authService from '../services/auth.service';
 
 const currentPage = ref(1);
 const totalPages = ref(1);
@@ -17,17 +18,24 @@ const expandedUser = ref('');
 const selectedUserName = ref('');
 const loadingOrders = ref(false);
 const selectedUserOrders = ref([]);
+const orderItems = ref([]);
+const loadingItems = ref(false);
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost/PHP_Cafeteria_Backend/public';
 
-const token = localStorage.getItem('token');
+const token = authService.authHeader().Authorization || '';
+
 
 const fetchUsers = async (page = 1) => {
   try {
     loading.value = true;
+
     const response = await axios.get(`${API_URL}/users-with-orders`, {
       params: {
         page,
+        start_date: startDate.value,
+        end_date: endDate.value,
+        user_id: selectedUser.value
       }, headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -49,6 +57,7 @@ const fetchUsers = async (page = 1) => {
 
 const fetchUserOrders = async (userId) => {
   try {
+    loadingOrders.value = true;
     const response = await axios.get(`${API_URL}/users/${userId}/orders`, {
       params: {
         startDate: startDate.value,
@@ -64,7 +73,7 @@ const fetchUserOrders = async (userId) => {
     console.error('Failed to fetch orders of user', err);
     return null;
   } finally {
-    loading.value = false;
+    loadingOrders.value = false;
   }
 }
 
@@ -85,7 +94,6 @@ const toggleUserOrders = async (user) => {
     //Fetch all orders for this user
     const response = await fetchUserOrders(user.user_id);
 
-
     if (response && response.data) {
       selectedUserOrders.value = response.data;
     } else {
@@ -102,15 +110,39 @@ const toggleUserOrders = async (user) => {
 
 }
 
-//To toggle orderItems
-const toggleOrderItems = (orderId) => {
-  expandedOrder.value = expandedOrder.value === orderId ? null : orderId;
+//To toggle orderItems when user click on the button
+const toggleOrderItems = async (orderId) => {
+  //To change the state
+  if (expandedOrder.value === orderId) {
+    expandedOrder.value = null;
+    return;
+  }
+
+  expandedOrder.value = orderId;
+
+  try {
+    loadingItems.value = true;
+    const response = await axios.get(`${API_URL}/orders/${orderId}/info`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    console.log(response);
+    if (response.data) {
+      orderItems.value = response.data.data;
+    } else {
+      orderItems.value = [];
+    }
+
+
+  } catch (err) {
+    console.error('Failed to fetch order Items: ', err);
+    orderItems.value = [];
+  } finally {
+    loadingItems.value = false;
+  }
 }
 
-//Format date if I need
-const formatDate = (dateString) => {
-
-}
 
 //When user click the apply every thing will be reset 
 const applyFilters = () => {
@@ -124,6 +156,17 @@ const applyFilters = () => {
 
   // Fetch users with filters
   fetchUsers(1);
+};
+
+// Get status badge class
+const getStatusBadgeClass = (status) => {
+  switch (status?.toLowerCase()) {
+    case 'delivered': return 'badge bg-success';
+    case 'processing': return 'badge bg-warning text-dark';
+    case 'cancelled': return 'badge bg-danger';
+    case 'pending': return 'badge bg-info';
+    default: return 'badge bg-secondary';
+  }
 };
 
 
@@ -166,13 +209,13 @@ const changePage = (page) => {
             <label for="userFilter" class="form-label">Filter by User</label>
             <select v-model="selectedUser" class="form-select" id="userFilter">
               <option value="">All Users</option>
-              <option v-for="user in users" :key="user.id" :value="user.id">{{ user.fullName }}</option>
+              <option v-for="user in users" :key="user.user_id" :value="user.user_id">{{ user.fullName }}</option>
             </select>
           </div>
 
           <!-- Apply Filter Button -->
           <div class="col-md-2 d-flex align-items-end">
-            <button class="btn btn-primary w-100">Apply Filters</button>
+            <button @click="applyFilters" class="btn btn-primary w-100">Apply Filters</button>
           </div>
         </div>
       </div>
@@ -243,67 +286,58 @@ const changePage = (page) => {
                             </tr>
                           </thead>
                           <tbody>
-                            <template v-for="order in selectedUserOrders.orders" :Key="order.id">
+                            <template v-for="order in selectedUserOrders" :Key="order.id">
                               <!-- Order Row - Clicking expands to show order items -->
-                              <tr class="order-row" data-bs-toggle="collapse" data-bs-target="#items-order-101">
+                              <tr class="order-row">
                                 <td>{{ order.id }}</td>
                                 <td>{{ order.created_at }}</td>
-                                <td><span class="badge bg-success">{{ order.order_status }}</span></td>
+                                <td><span :class="getStatusBadgeClass(order.order_status)">{{ order.order_status
+                                    }}</span></td>
                                 <td>${{ order.total_amount }}</td>
                                 <td>
-                                  <button class="btn btn-sm btn-outline-info">
-                                    <i class="bi bi-list-ul"></i> Items
+                                  <button @click="toggleOrderItems(order.id)" class="btn btn-sm btn-outline-info">
+                                    <i :class="expandedOrder === order.id ? 'bi bi-chevron-up' : 'bi bi-chevron-down'"
+                                      class="bi bi-list-ul"></i> Items
                                   </button>
                                 </td>
                               </tr>
 
-                              <!-- Expandable Order Items for Order 101 -->
-                              <tr class="collapse-row">
+                              <!-- Expandable Order Items for Order-->
+                              <tr v-if="expandedOrder === order.id">
                                 <td colspan="5" class="p-0">
-                                  <div id="items-order-101" class="collapse">
-                                    <div class="order-items p-3 bg-white">
-                                      <h6 class="mb-3">Order Items</h6>
-                                      <div class="row g-2">
+                                  <div class="order-items p-3 bg-white">
+                                    <h6 class="mb-3">Order Items</h6>
+                                    <div v-if="loadingItems" class="text-center py-3">
+                                      <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                      </div>
+                                      <p class="mt-2 mb-0">Loading orders...</p>
+                                    </div>
+                                    <div v-else>
+                                      <!-- No items message -->
+                                      <div v-if="!orderItems || orderItems.length === 0" class="text-center">
+                                        <p class="text-muted mb-0">No items found for this order.</p>
+                                      </div>
+
+                                      <div v-else class="row g-2">
                                         <!-- Order Item Card -->
-                                        <div class="col-md-4 col-sm-6">
-                                          <div class="card h-100">
-                                            <img src="https://via.placeholder.com/150" class="card-img-top"
-                                              alt="Product">
-                                            <div class="card-body">
-                                              <h6 class="card-title">Espresso Coffee</h6>
-                                              <p class="card-text mb-1">
-                                                <small class="text-muted">Qty: 2 x $4.50</small>
-                                              </p>
-                                              <p class="fw-bold mb-0">$9.00</p>
+                                        <template v-for="orderItem in orderItems" :key="orderItem.id">
+                                          <div class="col-md-4 col-sm-6">
+                                            <div class="card h-100">
+                                              <img
+                                                :src="orderItem.image || 'https://www.plas-pak.com/wp-content/themes/plaspak/img/product-placeholder.gif'"
+                                                class="card-img-top" alt="Product">
+                                              <div class="card-body">
+                                                <h6 class="card-title">{{ orderItem.name }}</h6>
+                                                <p class="card-text mb-1">
+                                                  <small class="text-muted">Qty: {{ orderItem.quantity }} x
+                                                    EGP {{ orderItem.price_at_order }}</small>
+                                                </p>
+                                                <p class="fw-bold mb-0">EGP {{ orderItem.price_at_order }}</p>
+                                              </div>
                                             </div>
                                           </div>
-                                        </div>
-                                        <div class="col-md-4 col-sm-6">
-                                          <div class="card h-100">
-                                            <img src="https://via.placeholder.com/150" class="card-img-top"
-                                              alt="Product">
-                                            <div class="card-body">
-                                              <h6 class="card-title">Chicken Sandwich</h6>
-                                              <p class="card-text mb-1">
-                                                <small class="text-muted">Qty: 1 x $8.75</small>
-                                              </p>
-                                              <p class="fw-bold mb-0">$8.75</p>
-                                            </div>
-                                          </div>
-                                        </div>
-                                        <div class="col-md-4 col-sm-6">
-                                          <div class="card h-100">
-                                            <img src="https://via.placeholder.com/150" class="card-img-top"
-                                              alt="Product">
-                                            <div class="card-body">
-                                              <h6 class="card-title">French Fries</h6>
-                                              <p class="card-text mb-1">
-                                                <small class="text-muted">Qty: 2 x $3.25</small>
-                                              </p>
-                                              <p class="fw-bold mb-0">$6.50</p>
-                                            </div>
-                                          </div>
-                                        </div>
+                                        </template>
                                       </div>
                                     </div>
                                   </div>

@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
+import authService from '../services/auth.service';
 
 const users = ref([]);
 const currentPage = ref(1);
@@ -20,7 +21,7 @@ const updateUser = (userId) => {
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost/PHP_Cafeteria_Backend/public';
 
 
-const token = localStorage.getItem('token');
+const token = authService.authHeader().Authorization || '';
 
 const fetchUsers = async (page = 1) => {
   try {

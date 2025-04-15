@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { useRoute, useRouter } from 'vue-router';
+import authService from '../services/auth.service';
 
 const user = ref({});
 const route = useRoute();
@@ -14,10 +15,14 @@ const loading = ref(false);
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost/PHP_Cafeteria_Backend/public';
 
+const token = authService.authHeader().Authorization || '';
+
 const fetchUser = async (userId) => {
   try {
     loading.value = true;
-    const response = await axios.get(`${API_URL}/users/${userId}`);
+    const response = await axios.get(`${API_URL}/users/${userId}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
 
     user.value = response.data;
 
