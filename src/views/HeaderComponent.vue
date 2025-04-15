@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import AuthService from '../services/auth.service'; // Make sure this path is correct
+import authService from '../services/auth.service'; // Make sure this path is correct
 
 
 const route = useRoute();
@@ -10,7 +10,7 @@ const isLoggedIn = ref(false);
 const user = ref(null);
 
 function logout() {
-  AuthService.logout();
+  authService.logout();
   isLoggedIn.value = false;
   user.value = null;
   router.push('/login');
@@ -31,7 +31,7 @@ watch(() => route.fullPath, () => {
 });
 
 function checkUserLogin() {
-  const userData = AuthService.getCurrentUser();
+  const userData = authService.getCurrentUser();
   if (userData && userData.token) {
     isLoggedIn.value = true;
 
@@ -71,6 +71,9 @@ function checkUserLogin() {
                   </li>
                   <li class="nav-item">
                     <router-link to="/checks" class="nav-link">Checks</router-link>
+                  </li>
+                  <li class="nav-item">
+                    <router-link to="/orders-queue" class="nav-link">Orders Queue</router-link>
                   </li>
                 </template>
                 <li class="nav-item">
