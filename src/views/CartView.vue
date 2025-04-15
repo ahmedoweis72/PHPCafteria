@@ -44,6 +44,16 @@
         </select>
       </div>
 
+      <!-- Users Dropdown -->
+      <div class="form-group w-50 mx-auto mb-4">
+      <label for="user" class="fw-bold">Select User:</label>
+         <select id="user" v-model="selectedUser" class="form-control"required>
+           <option v-for="user in users" :key="user.id" :value="user.id">
+              {{ user.name }} ({{ user.role }})
+           </option>
+         </select>
+      </div>
+
       <div class="d-flex justify-content-between align-items-center mt-4">
         <p class="fw-bold fs-5">Total: <span class="text-success">${{ totalPrice }}</span></p>
         <button class="btn btn-success" @click="confirmOrder">
@@ -69,7 +79,9 @@ export default {
       cart: cartState.items,
       //cart: JSON.parse(localStorage.getItem('cart')) || [],
       rooms: [],
-      selectedRoom: null
+      users: [],
+      selectedRoom: null,
+      selectedUser: null
     };
   },
   mounted() {
@@ -82,6 +94,14 @@ export default {
         if (this.rooms.length) this.selectedRoom = this.rooms[0].id;
       })
       .catch(error => console.error('Error loading rooms:', error));
+
+      fetch('http://localhost:8000/users') 
+      .then(res => res.json())
+      .then(data => {
+      this.users = data;
+      if (this.users.length) this.selectedUser = this.users[0].id;
+      })
+      .catch(error => console.error('Error loading users:', error));
   },
   methods: {
     increaseQuantity(item) {
@@ -112,7 +132,7 @@ export default {
     },
     confirmOrder() {
       const orderData = {
-        user_id: this.userId, 
+        user_id: this.selectedUser, 
         room_id: this.selectedRoom,
         total_amount: this.totalPrice, 
         order_items: this.cart.map(item => ({
@@ -130,7 +150,7 @@ export default {
       })
         .then(res => {
           alert('Order confirmed!');
-          this.clearCart();
+          cartState.clearCart();
           this.$router.push({ name: 'orderDetails', params: { id: res.data.orderId } });
         })
         .catch(error => console.error('Error confirming order:', error));
