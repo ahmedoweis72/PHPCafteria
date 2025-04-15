@@ -10,7 +10,6 @@ import OrderDetails from './views/orders/OrderDetails.vue';
 import HomeComponent from './views/HomeView.vue';
 import CheckComponent from './views/checks/CheckComponent.vue';
 import CartView from './views/CartView.vue';
-import OrderComponent from './views/orders/OrderComponent.vue';
 import OrdersComponent from './views/orders/OrdersComponent.vue';
 import OrdersQueueComponent from './views/orders/OrdersQueueComponent.vue';
 import LoginComponent from './views/auth/Login.vue';
@@ -40,7 +39,7 @@ const routes = [
         name:'Register',
         component:RegisterComponent,
         meta: {
-            requiresGuest : true
+            requiresAdmin : true
         }
     },
     {
@@ -59,14 +58,6 @@ const routes = [
         meta: {
             requiresAuth: true,
             requiresAdmin: true
-        }
-    },
-    {
-        path:'/order',
-        name:'Make Order',
-        component:OrderComponent,
-        meta: {
-            requiresAuth: true
         }
     },
     {
@@ -144,6 +135,15 @@ const routes = [
     {
         path:'/cart',
         name:'CartView',
+        component:CartView,
+        meta: {
+            requiresAuth: true
+        },
+
+    },
+    {
+        path:'/manual-order',
+        name:'Manual Order',
         component:CartView,
         meta: {
             requiresAuth: true

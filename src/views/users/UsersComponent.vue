@@ -21,16 +21,13 @@ const updateUser = (userId) => {
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost/PHP_Cafeteria_Backend/public';
 
 
-const token = authService.authHeader().Authorization || '';
 
 const fetchUsers = async (page = 1) => {
   try {
     loading.value = true;
     const response = await axios.get(`${API_URL}/users`, {
       params: { page },
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      headers: authService.authHeader()
     });
     users.value = response.data.data;
     totalPages.value = response.data.pagination.last_page;
@@ -56,7 +53,11 @@ const changePage = (page) => {
 const deleteUser = async (UserId) => {
   if (confirm("Do you really want to delete user?")) {
     try {
-      await axios.delete(`${API_URL}/users/${UserId}`);
+      await axios.delete(`${API_URL}/users/${UserId}`,
+        {
+          headers: authService.authHeader()
+        }
+      );
       fetchUsers(currentPage.value);
     } catch (err) {
       console.err('Failed to delete user:', err);
