@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { useRoute, useRouter } from 'vue-router';
-import authService from '../services/auth.service';
+import authService from '../../services/auth.service';
 
 const user = ref({});
 const route = useRoute();
@@ -20,6 +20,10 @@ const showConfirmPassword = ref(false);
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost/PHP_Cafeteria_Backend/public';
 
+<<<<<<< HEAD:src/views/UpdateUserComponent.vue
+=======
+
+>>>>>>> c7b43759692653b8803fc90588005d2396046185:src/views/users/UpdateUserComponent.vue
 const fetchUser = async (userId) => {
   try {
     loading.value = true;
@@ -112,11 +116,16 @@ const updateUserData = async () => {
 
   try {
     loading.value = true;
+<<<<<<< HEAD:src/views/UpdateUserComponent.vue
     const response = await axios.post(`${API_URL}/users/${userId}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
         ...authService.authHeader()
       }
+=======
+    await axios.post(`${API_URL}/users/${userId}`, formData, {
+      headers: authService.authHeader()
+>>>>>>> c7b43759692653b8803fc90588005d2396046185:src/views/users/UpdateUserComponent.vue
     });
 
     success.value = 'User updated successfully!';

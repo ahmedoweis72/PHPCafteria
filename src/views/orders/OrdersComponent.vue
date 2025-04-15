@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
-import authService from '../services/auth.service'
+import authService from '../../services/auth.service'
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
 

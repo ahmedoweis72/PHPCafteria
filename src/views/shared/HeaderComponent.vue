@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import authService from '../services/auth.service'; // Make sure this path is correct
+import authService from '../../services/auth.service'; // Make sure this path is correct
 
 
 const route = useRoute();
@@ -37,7 +37,6 @@ function checkUserLogin() {
     isLoggedIn.value = true;
 
     const userInfo = userData.decodedData?.data || {};
-    console.log(userInfo.image);
 
     user.value = {
       name: userInfo.name,
@@ -86,7 +85,7 @@ onMounted(() => {
                     <router-link to="/orders-queue" class="nav-link">Orders Queue</router-link>
                   </li>
                   <li class="nav-item">
-                    <router-link to="/order" class="nav-link">Manual Order</router-link>
+                    <router-link to="/manual-order" class="nav-link">Manual Order</router-link>
                   </li>
                 </template>
                 <li class="nav-item">

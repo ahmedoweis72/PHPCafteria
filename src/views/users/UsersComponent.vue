@@ -2,13 +2,13 @@
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
-import authService from '../services/auth.service';
+import authService from '../../services/auth.service';
 
 const users = ref([]);
 const currentPage = ref(1);
 const totalPages = ref(1);
 const loading = ref(false);
-const showEditForm = ref(false);
+
 
 const router = useRouter();
 
@@ -21,6 +21,10 @@ const updateUser = (userId) => {
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost/PHP_Cafeteria_Backend/public';
 
 
+<<<<<<< HEAD:src/views/UsersComponent.vue
+=======
+
+>>>>>>> c7b43759692653b8803fc90588005d2396046185:src/views/users/UsersComponent.vue
 const fetchUsers = async (page = 1) => {
   try {
     loading.value = true;
@@ -53,7 +57,11 @@ const changePage = (page) => {
 const deleteUser = async (UserId) => {
   if (confirm("Do you really want to delete user?")) {
     try {
-      await axios.delete(`${API_URL}/users/${UserId}`);
+      await axios.delete(`${API_URL}/users/${UserId}`,
+        {
+          headers: authService.authHeader()
+        }
+      );
       fetchUsers(currentPage.value);
     } catch (err) {
       console.err('Failed to delete user:', err);

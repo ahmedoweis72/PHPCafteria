@@ -1,20 +1,20 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import AddProductComponent from './views/AddProductComponent.vue'
-import AllProductComponent from './views/AllProductComponent.vue'
-import UsersComponent from './views/UsersComponent.vue';
+import AddProductComponent from './views/products/AddProductComponent.vue'
+import AllProductComponent from './views/products/AllProductComponent.vue'
+import UsersComponent from './views/users/UsersComponent.vue';
 import NotFound from './views/NotFound.vue'
-import AddCategoryComponent from './views/AddCategoryComponent.vue'
-import UpdateUserComponent from './views/UpdateUserComponent.vue';
-import EditProductComponent from './views/EditProductComponent.vue';
 import OrderDetails from './views/OrderDetails.vue';
+import AddCategoryComponent from './views/category/AddCategoryComponent.vue'
+import UpdateUserComponent from './views/users/UpdateUserComponent.vue';
+import EditProductComponent from './views/products/EditProductComponent.vue';
+import OrderDetails from './views/orders/OrderDetails.vue';
 import HomeComponent from './views/HomeView.vue';
-import CheckComponent from './views/CheckComponent.vue';
+import CheckComponent from './views/checks/CheckComponent.vue';
 import CartView from './views/CartView.vue';
-import OrderComponent from './views/OrderComponent.vue';
-import OrdersComponent from './views/OrdersComponent.vue';
-import OrdersQueueComponent from './views/OrdersQueueComponent.vue';
-import LoginComponent from './views/Login.vue';
-import RegisterComponent from './views/Register.vue';
+import OrdersComponent from './views/orders/OrdersComponent.vue';
+import OrdersQueueComponent from './views/orders/OrdersQueueComponent.vue';
+import LoginComponent from './views/auth/Login.vue';
+import RegisterComponent from './views/auth/Register.vue';
 import authService from './services/auth.service';
 
 const routes = [
@@ -59,14 +59,6 @@ const routes = [
         meta: {
             requiresAuth: true,
             requiresAdmin: true
-        }
-    },
-    {
-        path:'/order',
-        name:'Make Order',
-        component:OrderComponent,
-        meta: {
-            requiresAuth: true
         }
     },
     {
@@ -144,6 +136,15 @@ const routes = [
     {
         path:'/cart',
         name:'CartView',
+        component:CartView,
+        meta: {
+            requiresAuth: true
+        },
+
+    },
+    {
+        path:'/manual-order',
+        name:'Manual Order',
         component:CartView,
         meta: {
             requiresAuth: true

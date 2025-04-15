@@ -106,8 +106,12 @@
 </template>
 
 <script>
+<<<<<<< HEAD:src/views/Register.vue
 import authService from '../services/auth.service';
 import axios from 'axios';
+=======
+import authService from '../../services/auth.service';
+>>>>>>> c7b43759692653b8803fc90588005d2396046185:src/views/auth/Register.vue
 
 export default {
   name: 'RegisterUser',
@@ -217,6 +221,7 @@ export default {
           }
         });
 
+<<<<<<< HEAD:src/views/Register.vue
         // Direct axios request implementation
         const API_URL = import.meta.env.VITE_API_URL || 'http://localhost/PHP_Cafeteria_Backend/public';
 
@@ -228,6 +233,12 @@ export default {
         });
 
         this.message = response.data.message || 'User registered successfully!';
+=======
+        // Log the form data to check if it's being created correctly
+        console.log('Sending registration data...');
+        const response = await authService.register(formData);
+        this.message = response.message || 'User registered successfully!';
+>>>>>>> c7b43759692653b8803fc90588005d2396046185:src/views/auth/Register.vue
         this.error = false;
 
         // Reset form after successful registration

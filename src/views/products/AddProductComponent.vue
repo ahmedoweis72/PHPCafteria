@@ -69,7 +69,8 @@
                 Reset
               </button>
               <button type="submit" class="btn btn-lg btn-primary" :disabled="isSubmitting">
-                <span v-if="isSubmitting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                <span v-if="isSubmitting" class="spinner-border spinner-border-sm me-2" role="status"
+                  aria-hidden="true"></span>
                 {{ isSubmitting ? 'Saving...' : 'Save Product' }}
               </button>
             </div>
@@ -83,10 +84,10 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useProductStore } from '../stores/productStore'
+import { useProductStore } from '../../stores/productStore'
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
-import { useCategoryStore } from '../stores/categoryStore'
+import { useCategoryStore } from '../../stores/categoryStore'
 
 const router = useRouter()
 const productStore = useProductStore()
@@ -146,30 +147,30 @@ const validateForm = () => {
     showErrorToast('Product name is required')
     return false
   }
-  
+
   if (!product.value.price || isNaN(product.value.price) || product.value.price <= 0) {
     showErrorToast('Please enter a valid price')
     return false
   }
-  
+
   if (!product.value.categoryId) {
     showErrorToast('Please select a category')
     return false
   }
-  
+
   if (product.value.quantity === '' || isNaN(product.value.quantity) || product.value.quantity < 0) {
     showErrorToast('Please enter a valid quantity')
     return false
   }
-  
+
   return true
 }
 
 const submitForm = async () => {
   if (!validateForm()) return
-  
+
   isSubmitting.value = true
-  
+
   try {
     const response = await productStore.createProduct(product.value)
     if (response.status === 201) {
@@ -195,12 +196,12 @@ const handleImageUpload = (event) => {
       showErrorToast('Please select an image file')
       return
     }
-    
+
     if (file.size > 5 * 1024 * 1024) { // 5MB limit
       showErrorToast('Image size should be less than 5MB')
       return
     }
-    
+
     product.value.imageFile = file
     const reader = new FileReader()
     reader.onload = (e) => {
