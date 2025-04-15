@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import AuthService from '../services/auth.service'; 
+import cartState from '../stores/cartStore';
 
 const router = useRouter();
 const isLoggedIn = ref(false);
@@ -41,12 +42,11 @@ onMounted(() => {
   checkUserLogin();
   const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
   cartCount.value = cartItems.reduce((total, item) => total + item.quantity, 0);
-
 });
 </script>
 
 <template>
-  <header class="shadow-sm bg-light w-100 vw-100">
+  <header class="sticky-top bg-light shadow-sm">
     <div class="container-fluid py-3">
       <div class="row align-items-center">
         <div class="col d-flex align-items-center">
@@ -74,16 +74,20 @@ onMounted(() => {
               </template>
             </ul>
           </nav>
-
-          <div class="cart-icon">
-            <router-link to="/cart" class="nav-link">
-              <i class="fa fa-shopping-cart"></i>
-              <span class="badge badge-pill badge-primary">{{ cartCount }}</span>
-            </router-link>
-          </div>
         </div>
 
-        <div class="col-auto d-flex align-items-center">
+        <div class="col-auto d-flex align-items-center justify-content-end">
+          <!-- Cart Icon -->
+          <div class="cart-icon position-relative me-3">
+            <router-link to="/cart" class="nav-link position-relative">
+              <i class="fa fa-shopping-cart fa-lg"></i>
+              <span v-if="cartState.count > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                {{ cartCount }}
+                <span class="visually-hidden">items in cart</span>
+              </span>
+            </router-link>
+          </div>
+
           <!-- Show login button if not logged in -->
           <template v-if="!isLoggedIn">
             <button class="btn btn-primary" @click="login">Login</button>
@@ -105,15 +109,57 @@ onMounted(() => {
 </template>
 
 <style scoped>
+/* Sticky header */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* Navigation link active style */
 .nav-link.router-link-active {
   color: #42b983 !important;
   font-weight: 500;
 }
 
+/* Cart icon style */
+.cart-icon {
+  position: relative;
+}
+
+.cart-icon .badge {
+  font-size: 0.75rem;
+}
+
+/* Header styling */
 header {
-  margin: 0;
-  padding: 0;
-  max-width: 100%;
-  box-sizing: border-box;
+  background-color: #ffffff;
+  padding: 0.5rem 1rem;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #FF6B00;
+}
+
+.nav-link {
+  color: #333;
+}
+
+.nav-link:hover {
+  color: #FF6B00;
+}
+
+/* Align the cart icon and login/logout section */
+.col-auto {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+button {
+  font-weight: 600;
 }
 </style>

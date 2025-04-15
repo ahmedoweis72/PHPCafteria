@@ -52,9 +52,10 @@
 
 <script>
 import axios from 'axios';
+import cartState from '../stores/cartStore';
 
 export default {
-  computed: {
+  computed: { 
     totalPrice() {
       return this.cart.reduce((total, item) => total + (parseFloat(item.price) * (item.quantity || 1)), 0).toFixed(2);
     }
@@ -123,7 +124,7 @@ export default {
     .then(res => {
       alert('Order confirmed!');
       this.clearCart();
-      this.$router.push({ name: 'orderDetails', params: { id: res.data.orderId } }); // ← fix orderId هنا كمان
+      this.$router.push({ name: 'orderDetails', params: { id: res.data.orderId } });
     })
     .catch(error => console.error('Error confirming order:', error));
 }

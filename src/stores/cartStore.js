@@ -1,18 +1,65 @@
-import { defineStore } from "pinia";
-import { ref } from "vue";
+import { reactive } from 'vue';
 
-export const useCartStore = defineStore("cart", () => {
-  const cart = ref(JSON.parse(localStorage.getItem("cart")) || []);
+const cartState = reactive({
+  items: JSON.parse(localStorage.getItem('cart')) || [],
 
-  const addToCart = (product) => {
-    const existingProduct = cart.value.find((item) => item.id === product.id);
-    if (existingProduct) {
-      existingProduct.quantity += 1;
+  
+  get count() {
+    return this.items.reduce((total, item) => total + item.quantity, 0);
+  },
+
+  get totalPrice() {
+    return this.items.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2);
+  },
+
+  addItem(product) {
+    const existing = this.items.find(p => p.id === product.id);
+    if (existing) {
+      existing.quantity += product.quantity;
     } else {
-      cart.value.push({ ...product, quantity: 1 });
+      this.items.push({ ...product, quantity: product.quantity || 1 });
     }
-    localStorage.setItem("cart", JSON.stringify(cart.value));
-  };
+    this.save();
+  },
 
-  return { cart, addToCart };
+  removeItem(productId) {
+    this.items = this.items.filter(p => p.id !== productId);
+    this.save();
+  },
+
+  increaseQuantity(productId) {
+    const product = this.items.find(p => p.id === productId);
+    if (product) {
+      product.quantity += 1;
+      this.save();
+    }
+  },
+
+  decreaseQuantity(productId) {
+    const product = this.items.find(p => p.id === productId);
+    if (product && product.quantity > 1) {
+      product.quantity -= 1;
+      this.save();
+    }
+  },
+
+  clearCart() {
+    this.items = [];
+    this.save();
+  },
+
+  save() {
+    localStorage.setItem('cart', JSON.stringify(this.items));
+  },
+
+  refreshFromLocalStorage() {
+    this.items = JSON.parse(localStorage.getItem('cart')) || [];
+  }
 });
+
+
+window.addEventListener('storage', () => {
+  cartState.refreshFromLocalStorage();
+});
+
+export default cartState;
