@@ -76,7 +76,6 @@ function checkUserLogin() {
                 <li class="nav-item">
                   <router-link to="/order" class="nav-link">Manual Order</router-link>
                 </li>
-
               </template>
             </ul>
           </nav>

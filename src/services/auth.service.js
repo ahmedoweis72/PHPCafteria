@@ -1,11 +1,11 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost/PHP_Cafeteria_Backend/public/';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost/PHP_Cafeteria_Backend/public';
 
 class AuthService {
   async login(user) {
     try {
-      const response = await axios.post(API_URL + 'login', {
+      const response = await axios.post(API_URL + '/login', {
         email: user.email,
         password: user.password
       });
@@ -38,7 +38,7 @@ class AuthService {
         }
       };
       
-      const response = await axios.post(API_URL + 'admin/users', formData, config);
+      const response = await axios.post(API_URL + '/admin/users', formData, config);
       console.log('Registration response:', response.data);
       return response.data;
     } catch (error) {
@@ -78,6 +78,26 @@ class AuthService {
       return false;
     }
   }
+
+  isUser() {
+    const user = this.getCurrentUser();
+    if (!user || !user.token) return false;
+    
+    try {
+      const payload = user.token.split('.')[1];
+      const decoded = JSON.parse(atob(payload));
+      return decoded.data && decoded.data.role === 'user';
+    } catch (error) {
+      console.error('Error parsing token:', error);
+      return false;
+    }
+  }
+
+  isLoggedIn() {
+    const user = this.getCurrentUser();
+    return !!user && !!user.token;
+  }
+
   // Get auth header with JWT token for protected requests
   authHeader() {
     const user = this.getCurrentUser();
